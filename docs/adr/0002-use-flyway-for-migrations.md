@@ -30,3 +30,7 @@ the migrated schema.
   production, and cannot seed data reliably.
 - **Liquibase** — equally capable; XML/YAML changelogs are more verbose and
   Flyway's SQL-first approach is simpler for this project.
+
+## Update (2026-11-11)
+The H2/PostgreSQL gap is now covered: `PostgresProfileIT` runs the migrations
+and key queries against PostgreSQL 16 with Testcontainers in CI.

@@ -15,14 +15,15 @@ docs matter as much as features.
 | Run locally (H2, dev data) | `./mvnw spring-boot:run` |
 | Single test class | `./mvnw test -Dtest=AppleModelServiceTest` |
 | Coverage report | `target/site/jacoco/index.html` (after `verify`) |
-| Run with Docker | `docker compose up --build` |
+| Run with Docker | `docker compose up --build` (app + PostgreSQL) |
+| Deploy | Render Blueprint `render.yaml`, see `docs/deployment.md` |
 
 `./mvnw verify` must pass before every commit. CI runs the same command.
 
 ## Stack
 Java 21 · Spring Boot 3.5 · Maven · Spring Data JPA · Flyway · H2 (dev/test) ·
 PostgreSQL (`prod` profile) · springdoc-openapi · Bean Validation · Actuator ·
-JUnit 5 + MockMvc · JaCoCo.
+JUnit 5 + MockMvc · Testcontainers · JaCoCo · Docker.
 
 ## Package layout (package-by-feature)
 ```
@@ -79,7 +80,17 @@ repository.
   in `verify`), covering the happy path **and** error cases (404, 400, 409).
   They use `@SpringBootTest` + `@Transactional` so each test rolls back.
 - Test names describe behaviour: `returnsNotFoundWhenSlugIsUnknown()`.
+- `PostgresProfileIT` runs the `prod` profile on real PostgreSQL via
+  Testcontainers; it is skipped without Docker but always runs in CI.
 - Coverage target: **80%+ lines**, enforced by JaCoCo in `verify`.
+
+## Runtime
+- Production config comes **only** from environment variables (`DB_*`, `PORT`);
+  never commit credentials. See `docs/deployment.md`.
+- The Docker runtime is a slim JRE: only use JDK modules that are in it
+  (e.g. use `java.util.Random`, not `RandomGenerator.getDefault()`).
+- If you add a new endpoint, the CI Docker job's smoke test is a good place
+  for one extra `curl`.
 
 ## Data accuracy
 Seed data must only contain facts we are confident about. If a launch price

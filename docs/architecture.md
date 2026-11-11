@@ -93,10 +93,25 @@ sequenceDiagram
 | Profile | Database | Use |
 |---------|----------|-----|
 | default | H2 in-memory | local development, tests |
-| `prod`  | PostgreSQL (via env vars) | Docker / Render deployment |
+| `prod`  | PostgreSQL (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) | Docker / Render deployment |
+
+## Deployment
+
+```mermaid
+flowchart LR
+    GH[GitHub main] -->|auto-deploy| R[Render: Docker web service<br/>multi-stage image, JRE 21, non-root]
+    R -->|DB_* from Blueprint| PG[(Render PostgreSQL 16)]
+    R -->|/actuator/health| HC[Render health check]
+    U[Visitors] -->|HTTPS| R
+```
+
+CI (`.github/workflows/ci.yml`) runs `mvn verify`, including a Testcontainers
+PostgreSQL test, and in a second job builds the Docker image, starts it against
+PostgreSQL and smoke-tests it. See [deployment.md](deployment.md).
 
 Flyway runs the same migrations against both databases, so the SQL is kept
-portable (ANSI types, no vendor-specific functions).
+portable (ANSI types, no vendor-specific functions). `PostgresProfileIT`
+proves it on real PostgreSQL.
 
 ## Cross-cutting concerns
 - **Errors**: one `@RestControllerAdvice` maps exceptions to `ProblemDetail`.
