@@ -25,3 +25,9 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  default-produces-media-type: application/json
+
+app:
+  version: '@project.version@'

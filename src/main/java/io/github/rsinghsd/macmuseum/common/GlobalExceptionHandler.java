@@ -1,9 +1,11 @@
 package io.github.rsinghsd.macmuseum.common;
 
+import io.github.rsinghsd.macmuseum.model.CpuArchitecture;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -70,6 +73,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail body = problem(HttpStatus.BAD_REQUEST, "Validation failed",
                 "One or more fields are invalid.");
         body.setProperty("errors", errors);
+        return ResponseEntity.badRequest().headers(headers).body(body);
+    }
+
+    /** Query/path parameters that cannot be converted, e.g. {@code ?year=abc} or {@code ?cpu=z80}. */
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(
+            @NonNull TypeMismatchException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request) {
+        String name = ex instanceof MethodArgumentTypeMismatchException mismatch
+                ? mismatch.getName() : ex.getPropertyName();
+        String detail = "Invalid value '" + ex.getValue() + "' for parameter '" + name + "'";
+        Class<?> required = ex.getRequiredType();
+        if (required == CpuArchitecture.class) {
+            detail += ". Allowed values: " + CpuArchitecture.allowedValues();
+        } else if (required != null) {
+            detail += ". Expected type: " + required.getSimpleName();
+        }
+        ProblemDetail body = problem(HttpStatus.BAD_REQUEST, "Invalid parameter", detail);
         return ResponseEntity.badRequest().headers(headers).body(body);
     }
 

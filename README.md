@@ -7,7 +7,7 @@
 
 > A REST API and retro web catalog of Apple hardware history, from the Apple I (1976) to Apple Silicon — like a Pokédex, but for Macs.
 
-> 🚧 **Work in progress.** The CRUD API and seed catalog are done (v0.2). See the [roadmap](#roadmap).
+> 🚧 **Work in progress.** The full REST API is done (v0.3); the retro frontend is next. See the [roadmap](#roadmap).
 
 <!-- Screenshot placeholder: replace with docs/screenshot.png once the frontend ships -->
 ![Screenshot placeholder](https://placehold.co/800x450?text=Mac+Museum+screenshot+coming+soon)
@@ -40,9 +40,32 @@
 ./mvnw spring-boot:run   # http://localhost:8080
 ```
 
+## API
+
+Base path `/api/v1`. Interactive docs at **`/swagger-ui.html`**, OpenAPI JSON at `/v3/api-docs`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/models` | Paginated list. Filters: `year`, `fromYear`, `toYear`, `family`, `cpu`, `q`; plus `page`, `size`, `sort` |
+| GET | `/models/{slug}` | One model |
+| POST | `/models` | Create (201 + `Location`) |
+| PUT | `/models/{slug}` | Replace (can rename the slug) |
+| DELETE | `/models/{slug}` | Delete (204) |
+| GET | `/families` | Product families with model counts |
+| GET | `/timeline` | Models grouped by CPU era, oldest first |
+| GET | `/compare?slugs=a,b` | 2–4 models side by side with ratios against the first |
+| GET | `/random` | Random model; `?day=2026-11-11` gives a stable "Mac of the day" |
+
+CPU values: `MOS_6502`, `M68K`, `ARM`, `POWERPC`, `INTEL_X86`, `APPLE_SILICON` (case-insensitive, dashes allowed).
+
 ## Try it
 ```bash
 curl "http://localhost:8080/api/v1/models?size=5&sort=releaseYear,desc"
+curl "http://localhost:8080/api/v1/models?family=powerbook&cpu=powerpc"
+curl "http://localhost:8080/api/v1/models?fromYear=1998&toYear=2002&q=g4"
+curl http://localhost:8080/api/v1/timeline
+curl "http://localhost:8080/api/v1/compare?slugs=macintosh-128k,macbook-air-m1"
+curl "http://localhost:8080/api/v1/random?day=2026-11-11"
 curl http://localhost:8080/api/v1/models/macintosh-128k
 curl http://localhost:8080/api/v1/families
 
@@ -57,6 +80,16 @@ Errors are returned as [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807) proble
 {"type":"about:blank","title":"Resource not found","status":404,
  "detail":"No model found with slug 'nope'","instance":"/api/v1/models/nope"}
 ```
+Validation errors add an `errors` map (field → message); bad query parameters explain the allowed values:
+```json
+{"title":"Invalid parameter","status":400,
+ "detail":"Invalid value 'z80' for parameter 'cpu'. Allowed values: MOS_6502, M68K, ARM, POWERPC, INTEL_X86, APPLE_SILICON"}
+```
+Example `/compare` result (Macintosh 128K vs MacBook Air M1):
+```json
+{"baselineSlug":"macintosh-128k","otherSlug":"macbook-air-m1","yearsApart":36,
+ "clockSpeedRatio":400.0,"ramRatio":65536.0,"priceDifferenceUsd":-1496.00}
+```
 
 ## Documentation
 - [Architecture](docs/architecture.md)
@@ -67,7 +100,7 @@ Errors are returned as [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807) proble
 ## Roadmap
 - [x] **v0.1** — Project setup, CI, docs, user stories
 - [x] **v0.2** — Domain, migrations, seed data, CRUD API with tests
-- [ ] **v0.3** — Filters, timeline, compare, random, Swagger, error handling
+- [x] **v0.3** — Filters, timeline, compare, random, Swagger, error handling
 - [ ] **v0.4** — Retro Platinum web frontend
 - [ ] **v0.5** — Docker, prod profile
 - [ ] **v1.0** — Deployed on Render, final polish
