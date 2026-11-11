@@ -31,7 +31,11 @@ class OpenApiIT {
                 .andExpect(jsonPath("$.paths['/api/v1/families'].get").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/timeline'].get").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/compare'].get.responses['404']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/random'].get").exists());
+                .andExpect(jsonPath("$.paths['/api/v1/random'].get").exists())
+                .andExpect(jsonPath("$.components.securitySchemes.apiKey.name").value("X-API-Key"))
+                .andExpect(jsonPath("$.paths['/api/v1/models'].post.security[0].apiKey").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/models'].post.responses['401']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/models'].get.security").doesNotExist());
     }
 
     @Test

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="A retro catalog of Apple hardware history, from the Apple I to Apple silicon.">
+  <meta name="theme-color" content="#dddddd">
+  <title>Mac Museum</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="css/platinum.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="menubar">
+    <div class="menubar-brand">
+      <img src="img/icon.svg" alt="" width="20" height="20">
+      <span>Mac Museum</span>
+    </div>
+    <nav class="menubar-nav" aria-label="Sections">
+      <a href="#catalog" data-view-link="catalog">Catalog</a>
+      <a href="#timeline" data-view-link="timeline">Timeline</a>
+      <a href="#compare" data-view-link="compare">Compare</a>
+    </nav>
+    <time class="menubar-clock" id="clock" aria-hidden="true"></time>
+  </header>
+
+  <main id="main" class="desktop">
+    <!-- ============================== Catalog ============================== -->
+    <div class="view" data-view="catalog">
+      <section class="window" aria-labelledby="motd-title">
+        <header class="titlebar">
+          <h2 class="title" id="motd-title">Mac of the Day</h2>
+        </header>
+        <div class="window-body motd" id="motd" aria-live="polite">
+          <p class="muted">Loading…</p>
+        </div>
+      </section>
+
+      <section class="window" aria-labelledby="catalog-title">
+        <header class="titlebar">
+          <h2 class="title" id="catalog-title">Catalog</h2>
+        </header>
+        <div class="window-body">
+          <form class="filters" id="filters" role="search">
+            <label class="field field-wide">
+              <span>Search</span>
+              <input type="search" name="q" placeholder="cube, G4, MagSafe…" autocomplete="off">
+            </label>
+            <label class="field">
+              <span>Family</span>
+              <select name="family"><option value="">All families</option></select>
+            </label>
+            <label class="field">
+              <span>CPU</span>
+              <select name="cpu">
+                <option value="">All CPUs</option>
+                <option value="MOS_6502">MOS 6502</option>
+                <option value="M68K">Motorola 68k</option>
+                <option value="ARM">ARM (licensed)</option>
+                <option value="POWERPC">PowerPC</option>
+                <option value="INTEL_X86">Intel x86</option>
+                <option value="APPLE_SILICON">Apple silicon</option>
+              </select>
+            </label>
+            <label class="field field-year">
+              <span>From</span>
+              <input type="number" name="fromYear" inputmode="numeric" min="1976" max="2100" placeholder="1976">
+            </label>
+            <label class="field field-year">
+              <span>To</span>
+              <input type="number" name="toYear" inputmode="numeric" min="1976" max="2100" placeholder="2025">
+            </label>
+            <label class="field">
+              <span>Sort</span>
+              <select name="sort">
+                <option value="releaseYear,asc">Oldest first</option>
+                <option value="releaseYear,desc">Newest first</option>
+                <option value="name,asc">Name A–Z</option>
+                <option value="clockSpeedMhz,desc">Fastest clock</option>
+                <option value="baseRamKb,desc">Most RAM</option>
+                <option value="launchPriceUsd,desc">Most expensive</option>
+              </select>
+            </label>
+            <div class="filters-actions">
+              <button type="reset" class="btn">Clear</button>
+            </div>
+          </form>
+
+          <p class="status" id="catalog-status" aria-live="polite"></p>
+          <ul class="cards" id="cards"></ul>
+
+          <nav class="pager" aria-label="Pagination">
+            <button type="button" class="btn" id="prev-page">◀ Prev</button>
+            <span id="page-info"></span>
+            <button type="button" class="btn" id="next-page">Next ▶</button>
+          </nav>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================== Timeline ============================== -->
+    <div class="view" data-view="timeline" hidden>
+      <section class="window" aria-labelledby="timeline-title">
+        <header class="titlebar">
+          <h2 class="title" id="timeline-title">Timeline</h2>
+        </header>
+        <div class="window-body">
+          <p class="muted">Apple's history by processor. Eras overlap where product lines ran side by side.</p>
+          <ol class="timeline" id="timeline"></ol>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================== Compare ============================== -->
+    <div class="view" data-view="compare" hidden>
+      <section class="window" aria-labelledby="compare-title">
+        <header class="titlebar">
+          <h2 class="title" id="compare-title">Compare</h2>
+        </header>
+        <div class="window-body">
+          <form class="compare-pickers" id="compare-form">
+            <label class="field"><span>Model A</span><select name="a" required></select></label>
+            <button type="button" class="btn btn-icon" id="swap" aria-label="Swap models">⇄</button>
+            <label class="field"><span>Model B</span><select name="b" required></select></label>
+          </form>
+          <div id="compare-result" aria-live="polite"></div>
+          <p class="muted small">Tip: the address bar link shares this comparison.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============================== Detail ============================== -->
+  <dialog class="window dialog" id="detail" aria-labelledby="detail-title">
+    <header class="titlebar">
+      <button type="button" class="closebox" id="detail-close" aria-label="Close"></button>
+      <h2 class="title" id="detail-title">Model</h2>
+    </header>
+    <div class="window-body" id="detail-body"></div>
+  </dialog>
+
+  <!-- ============================== Alert ============================== -->
+  <div class="alert" id="alert" role="alert" hidden>
+    <img src="img/icon.svg" alt="" width="32" height="32">
+    <p id="alert-text"></p>
+    <button type="button" class="btn btn-default" id="alert-ok">OK</button>
+  </div>
+
+  <footer class="footer">
+    <a href="swagger-ui.html">API docs (Swagger UI)</a>
+    <span aria-hidden="true">·</span>
+    <a href="v3/api-docs">OpenAPI JSON</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/rsinghSD/mac-museum-api">Source on GitHub</a>
+    <p class="small">Fan-made museum. Not affiliated with or endorsed by Apple Inc.</p>
+  </footer>
+</body>
+</html>

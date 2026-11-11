@@ -1,0 +1,461 @@
+/*
+ * Mac Museum — an original stylesheet inspired by the 1990s "Platinum" desktop look:
+ * light grey bevelled windows, pinstriped title bars and a pixel display font.
+ * No Apple logos or Apple-owned artwork are used. Mobile-first.
+ */
+
+:root {
+  --platinum: #dddddd;
+  --platinum-light: #eeeeee;
+  --highlight: #ffffff;
+  --shadow: #888888;
+  --dark: #555555;
+  --ink: #000000;
+  --accent: #3355aa;       /* selection / links */
+  --accent-ink: #ffffff;
+  --win: #ffe58a;          /* compare "winner" highlight */
+  --desktop-a: #6f7fae;
+  --desktop-b: #6577a8;
+  --pixel-font: "Pixelify Sans", ui-monospace, "Courier New", monospace;
+  --body-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius: 4px;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font: 15px/1.45 var(--body-font);
+  color: var(--ink);
+  /* Subtle two-tone dither, like an old desktop pattern. */
+  background-color: var(--desktop-a);
+  background-image:
+    repeating-conic-gradient(var(--desktop-a) 0% 25%, var(--desktop-b) 0% 50%);
+  background-size: 4px 4px;
+}
+
+a { color: var(--accent); }
+
+[hidden] { display: none !important; }
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--highlight);
+  padding: 8px;
+  z-index: 100;
+}
+.skip-link:focus { left: 8px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------ menu bar ---- */
+
+.menubar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top);
+  min-height: 40px;
+  background: var(--platinum);
+  border-bottom: 1px solid var(--ink);
+  box-shadow: inset 0 1px var(--highlight), inset 0 -1px var(--shadow);
+  font-family: var(--pixel-font);
+}
+
+.menubar-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.menubar-brand img { image-rendering: pixelated; }
+
+.menubar-nav {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.menubar-nav a {
+  padding: 8px 10px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.menubar-nav a[aria-current="page"],
+.menubar-nav a:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.menubar-clock {
+  margin-left: auto;
+  display: none;
+}
+
+/* ------------------------------------------------------------- windows ---- */
+
+.desktop {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 8px;
+}
+
+.view { display: grid; gap: 14px; }
+
+.window {
+  background: var(--platinum);
+  border: 1px solid var(--ink);
+  box-shadow:
+    inset 1px 1px var(--highlight),
+    inset -1px -1px var(--shadow),
+    2px 2px 0 rgba(0, 0, 0, .45);
+}
+
+.titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  margin: 3px 3px 0;
+  /* Horizontal pinstripes. */
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--platinum-light) 0 1px,
+    var(--shadow) 1px 2px
+  );
+  background-clip: content-box;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--shadow);
+}
+
+.titlebar .title {
+  margin: 0;
+  padding: 0 10px;
+  font: 700 15px/18px var(--pixel-font);
+  background: var(--platinum);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 64px);
+}
+
+.closebox {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  padding: 0;
+  background: var(--platinum);
+  border: 1px solid var(--ink);
+  box-shadow: inset 1px 1px var(--highlight), inset -1px -1px var(--shadow);
+  cursor: pointer;
+}
+.closebox::after {               /* bigger invisible tap target */
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
+.closebox:active { background: var(--shadow); }
+
+.window-body {
+  padding: 12px;
+  margin: 0 3px 3px;
+  background: var(--platinum);
+}
+
+/* ------------------------------------------------------------- controls ---- */
+
+.btn {
+  font: 14px var(--pixel-font);
+  min-height: 36px;
+  padding: 6px 14px;
+  color: var(--ink);
+  background: var(--platinum);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: inset 1px 1px var(--highlight), inset -1px -1px var(--shadow);
+  cursor: pointer;
+}
+.btn:active:not(:disabled) {
+  background: var(--dark);
+  color: var(--highlight);
+  box-shadow: inset 1px 1px var(--ink), inset -1px -1px var(--shadow);
+}
+.btn:disabled { color: var(--shadow); cursor: default; }
+.btn-default { outline: 2px solid var(--ink); outline-offset: 2px; }
+.btn-icon { padding: 6px 10px; }
+
+.field { display: grid; gap: 4px; font-size: 13px; }
+.field > span { font-family: var(--pixel-font); }
+
+input, select {
+  font: 16px var(--body-font);   /* 16px prevents iOS zoom on focus */
+  min-height: 36px;
+  width: 100%;
+  padding: 4px 8px;
+  color: var(--ink);
+  background: var(--highlight);
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  box-shadow: inset 1px 1px var(--shadow);
+}
+select {
+  appearance: none;
+  padding-right: 28px;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%) right 14px center / 6px 6px no-repeat,
+    linear-gradient(-45deg, transparent 50%, var(--ink) 50%) right 8px center / 6px 6px no-repeat,
+    var(--highlight);
+}
+
+/* ------------------------------------------------------------- catalog ---- */
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.field-wide { grid-column: 1 / -1; }
+.filters-actions { display: flex; align-items: end; }
+.filters-actions .btn { width: 100%; }
+
+.status { margin: 0 0 8px; font-size: 13px; color: var(--dark); min-height: 1.4em; }
+.muted { color: var(--dark); }
+.small { font-size: 12px; }
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  padding: 10px 12px;
+  background: var(--platinum-light);
+  border: 1px solid var(--ink);
+  box-shadow: inset 1px 1px var(--highlight), inset -1px -1px var(--shadow);
+  cursor: pointer;
+}
+.card:hover { background: var(--highlight); }
+.card:active { background: var(--accent); color: var(--accent-ink); }
+.card-title { display: block; font: 700 16px var(--pixel-font); }
+.card-meta { display: block; font-size: 13px; color: var(--dark); }
+.card:active .card-meta { color: inherit; }
+
+.chip {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 0 6px;
+  font: 12px var(--pixel-font);
+  border: 1px solid var(--ink);
+  background: var(--highlight);
+}
+.chip[data-cpu="MOS_6502"] { background: #f3d9a4; }
+.chip[data-cpu="M68K"] { background: #f0c0b0; }
+.chip[data-cpu="ARM"] { background: #c8e6c0; }
+.chip[data-cpu="POWERPC"] { background: #c4d4f0; }
+.chip[data-cpu="INTEL_X86"] { background: #d8c8ec; }
+.chip[data-cpu="APPLE_SILICON"] { background: #f5f0b0; }
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  font: 14px var(--pixel-font);
+}
+
+/* ------------------------------------------------------- mac of the day ---- */
+
+.motd { display: grid; gap: 8px; }
+.motd h3 { margin: 0; font: 700 20px var(--pixel-font); }
+.motd p { margin: 0; }
+.motd-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ------------------------------------------------------------- detail ---- */
+
+.dialog {
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  overflow: auto;
+}
+.dialog::backdrop { background: rgba(0, 0, 0, .35); }
+
+.specs {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--highlight);
+  border: 1px solid var(--ink);
+  margin: 10px 0;
+}
+.specs th, .specs td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--platinum);
+  text-align: left;
+  vertical-align: top;
+}
+.specs th { width: 40%; font: 13px var(--pixel-font); background: var(--platinum-light); }
+
+.detail-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+/* ------------------------------------------------------------- timeline ---- */
+
+.timeline { list-style: none; margin: 12px 0 0; padding: 0; }
+
+.era {
+  position: relative;
+  padding: 0 0 18px 22px;
+  border-left: 3px solid var(--ink);
+  margin-left: 8px;
+}
+.era::before {                 /* square bullet on the line */
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: 2px;
+  width: 15px;
+  height: 15px;
+  background: var(--highlight);
+  border: 3px solid var(--ink);
+}
+.era h3 { margin: 0; font: 700 18px var(--pixel-font); }
+.era-years { font: 13px var(--pixel-font); color: var(--dark); }
+.era p { margin: 4px 0 8px; }
+
+.era ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.era-entry {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+  text-align: left;
+  background: var(--platinum-light);
+  border: 1px solid var(--ink);
+  cursor: pointer;
+}
+.era-entry:hover { background: var(--highlight); }
+.era-entry:active { background: var(--accent); color: var(--accent-ink); }
+.era-entry b { font: 700 14px var(--pixel-font); min-width: 3.2em; }
+
+/* ------------------------------------------------------------- compare ---- */
+
+.compare-pickers {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.compare-table { table-layout: fixed; }
+.compare-table th { width: 26%; }
+.compare-table td { word-wrap: break-word; }
+.compare-table thead th { background: var(--platinum); font-weight: 700; width: auto; }
+.compare-table td.win { background: var(--win); font-weight: 700; }
+.compare-summary { margin: 0; padding-left: 18px; }
+
+/* ------------------------------------------------------------- alert ---- */
+
+.alert {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  top: 30%;
+  transform: translateX(-50%);
+  width: min(92vw, 380px);
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  background: var(--platinum);
+  border: 1px solid var(--ink);
+  box-shadow: inset 1px 1px var(--highlight), inset -1px -1px var(--shadow), 3px 3px 0 rgba(0, 0, 0, .5);
+}
+.alert img { image-rendering: pixelated; }
+.alert p { margin: 0; }
+.alert .btn { grid-column: 2; justify-self: end; min-width: 80px; }
+
+/* ------------------------------------------------------------- footer ---- */
+
+.footer {
+  padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
+  text-align: center;
+  font: 13px var(--pixel-font);
+  background: var(--platinum);
+  border-top: 1px solid var(--ink);
+  box-shadow: inset 0 1px var(--highlight);
+}
+.footer a { color: var(--ink); }
+.footer p { margin: 6px 0 0; color: var(--dark); }
+
+/* ------------------------------------------------------------- larger ---- */
+
+@media (min-width: 560px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .filters { grid-template-columns: repeat(3, 1fr); }
+  .field-wide { grid-column: 1 / -1; }
+  .desktop { padding: 20px 16px; }
+}
+
+@media (min-width: 760px) {
+  .menubar-clock { display: block; }
+  .filters { grid-template-columns: 2fr 1.3fr 1.3fr .8fr .8fr 1.2fr auto; }
+  .field-wide { grid-column: auto; }
+  .cards { grid-template-columns: repeat(3, 1fr); }
+  .dialog {
+    width: min(640px, 92vw);
+    height: auto;
+    max-height: 88vh;
+    margin: auto;
+  }
+  .view[data-view="catalog"] { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 1000px) {
+  .cards { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dialog[open] { animation: zoom .12s steps(3); }
+  @keyframes zoom { from { transform: scale(.9); opacity: .4; } to { transform: none; opacity: 1; } }
+}

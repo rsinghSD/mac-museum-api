@@ -15,14 +15,15 @@ docs matter as much as features.
 | Run locally (H2, dev data) | `./mvnw spring-boot:run` |
 | Single test class | `./mvnw test -Dtest=AppleModelServiceTest` |
 | Coverage report | `target/site/jacoco/index.html` (after `verify`) |
-| Run with Docker | `docker compose up --build` |
+| Run with Docker | `docker compose up --build` (app + PostgreSQL) |
+| Deploy | Render Blueprint `render.yaml`, see `docs/deployment.md` |
 
 `./mvnw verify` must pass before every commit. CI runs the same command.
 
 ## Stack
 Java 21 · Spring Boot 3.5 · Maven · Spring Data JPA · Flyway · H2 (dev/test) ·
 PostgreSQL (`prod` profile) · springdoc-openapi · Bean Validation · Actuator ·
-JUnit 5 + MockMvc · JaCoCo.
+JUnit 5 + MockMvc · Testcontainers · JaCoCo · Docker.
 
 ## Package layout (package-by-feature)
 ```
@@ -72,6 +73,10 @@ repository.
 - Filters are optional query params combined with AND; unknown filter values
   that cannot be converted → 400, unknown family slug → empty page.
 - Randomness goes through the injectable `RandomGenerator` bean.
+- Write methods (POST/PUT/PATCH/DELETE under `/api/v1`) are guarded by
+  `WriteApiKeyInterceptor` (`X-API-Key` vs `WRITE_API_KEY`). Mark new write
+  operations with `@ApiErrorResponses.RequiresApiKey`. Dev/test default: open
+  without a key; `prod` default: 403 without a key.
 
 ## Testing
 - Unit tests for services (JUnit 5 + Mockito), named `*Test`.
@@ -79,7 +84,17 @@ repository.
   in `verify`), covering the happy path **and** error cases (404, 400, 409).
   They use `@SpringBootTest` + `@Transactional` so each test rolls back.
 - Test names describe behaviour: `returnsNotFoundWhenSlugIsUnknown()`.
+- `PostgresProfileIT` runs the `prod` profile on real PostgreSQL via
+  Testcontainers; it is skipped without Docker but always runs in CI.
 - Coverage target: **80%+ lines**, enforced by JaCoCo in `verify`.
+
+## Runtime
+- Production config comes **only** from environment variables (`DB_*`, `PORT`);
+  never commit credentials. See `docs/deployment.md`.
+- The Docker runtime is a slim JRE: only use JDK modules that are in it
+  (e.g. use `java.util.Random`, not `RandomGenerator.getDefault()`).
+- If you add a new endpoint, the CI Docker job's smoke test is a good place
+  for one extra `curl`.
 
 ## Data accuracy
 Seed data must only contain facts we are confident about. If a launch price
@@ -89,6 +104,20 @@ or spec is uncertain, leave it `NULL`. Summaries are written in our own words.
 Plain HTML/CSS/vanilla JS in `src/main/resources/static`. No build step, no
 framework. Mac OS 8 "Platinum"-inspired look, mobile-first. **Do not use the
 Apple logo or any Apple-owned assets.**
+```
+static/
+├── index.html        all views as windows; one page
+├── css/platinum.css  design tokens in :root, mobile-first media queries
+├── img/icon.svg      original pixel-art icon
+└── js/
+    ├── app.js        routing (#catalog, #timeline, #compare=a,b, #model=slug) + views
+    ├── api.js        fetch wrapper; rejects with ApiError holding the ProblemDetail
+    ├── dom.js        h() element builder — text via textContent only (no innerHTML)
+    └── format.js     clock/RAM/price formatting; null → "Unknown"
+```
+- Never use `innerHTML` with API data; build nodes with `h()`.
+- Keep tap targets ≥ 36px and inputs at 16px font (prevents iOS zoom).
+- Test changes at 390px width and on desktop.
 
 ## Git
 - Conventional, imperative commit messages ("Add timeline endpoint").

@@ -73,6 +73,7 @@ public class AppleModelController {
     }
 
     @PostMapping
+    @ApiErrorResponses.RequiresApiKey
     @Operation(summary = "Create a model")
     @ApiResponse(responseCode = "201", description = "Created; the Location header points to the new model")
     @ApiErrorResponses.BadRequest
@@ -85,6 +86,7 @@ public class AppleModelController {
     }
 
     @PutMapping("/{slug}")
+    @ApiErrorResponses.RequiresApiKey
     @Operation(summary = "Replace a model",
             description = "Replaces every field. The slug in the body may differ from the path to rename the model.")
     @ApiErrorResponses.BadRequest
@@ -95,6 +97,7 @@ public class AppleModelController {
     }
 
     @DeleteMapping("/{slug}")
+    @ApiErrorResponses.RequiresApiKey
     @Operation(summary = "Delete a model")
     @ApiResponse(responseCode = "204", description = "Deleted")
     @ApiErrorResponses.NotFound

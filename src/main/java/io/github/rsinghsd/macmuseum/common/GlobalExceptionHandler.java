@@ -46,6 +46,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem(HttpStatus.BAD_REQUEST, "Bad request", ex.getMessage());
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    ResponseEntity<ProblemDetail> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.WWW_AUTHENTICATE, "ApiKey header=\"" + WriteApiKeyInterceptor.HEADER + "\"")
+                .body(problem(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage()));
+    }
+
+    @ExceptionHandler(WritesDisabledException.class)
+    ProblemDetail handleWritesDisabled(WritesDisabledException ex) {
+        return problem(HttpStatus.FORBIDDEN, "Writes disabled", ex.getMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     ProblemDetail handleIntegrity(DataIntegrityViolationException ex) {
         log.warn("Data integrity violation", ex);
