@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -15,8 +16,10 @@ import io.github.rsinghsd.macmuseum.common.ResourceNotFoundException;
 import io.github.rsinghsd.macmuseum.family.ProductFamily;
 import io.github.rsinghsd.macmuseum.family.ProductFamilyService;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.random.RandomGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -38,6 +41,9 @@ class AppleModelServiceTest {
 
     @Mock
     ProductFamilyService familyService;
+
+    @Mock
+    RandomGenerator random;
 
     @InjectMocks
     AppleModelService service;
@@ -185,6 +191,60 @@ class AppleModelServiceTest {
         when(repository.findBySlug("nope")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete("nope")).isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void findBySlugsKeepsRequestedOrder() {
+        var plus = new AppleModel("macintosh-plus", "Macintosh Plus", 1986, MACINTOSH,
+                CpuArchitecture.M68K, "Motorola 68000", "More memory.");
+        when(repository.findBySlugIn(List.of("macintosh-plus", "macintosh-128k")))
+                .thenReturn(List.of(mac128k(), plus));
+
+        assertThat(service.findBySlugs(List.of("macintosh-plus", "macintosh-128k")))
+                .extracting(AppleModelResponse::slug)
+                .containsExactly("macintosh-plus", "macintosh-128k");
+    }
+
+    @Test
+    void findBySlugsThrowsForMissingSlug() {
+        when(repository.findBySlugIn(List.of("macintosh-128k", "nope"))).thenReturn(List.of(mac128k()));
+
+        assertThatThrownBy(() -> service.findBySlugs(List.of("macintosh-128k", "nope")))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("'nope'");
+    }
+
+    @Test
+    void findRandomUsesGeneratorWithoutDay() {
+        when(repository.count()).thenReturn(10L);
+        when(random.nextInt(10)).thenReturn(7);
+        when(repository.findAll(PageRequest.of(7, 1, Sort.by("slug"))))
+                .thenReturn(new PageImpl<>(List.of(mac128k())));
+
+        assertThat(service.findRandom(null).slug()).isEqualTo("macintosh-128k");
+    }
+
+    @Test
+    void findRandomIsDeterministicForADay() {
+        when(repository.count()).thenReturn(10L);
+        when(repository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(mac128k())));
+
+        service.findRandom(LocalDate.of(2026, 11, 11));
+        service.findRandom(LocalDate.of(2026, 11, 11));
+
+        verify(repository, times(2)).findAll(PageRequest.of(
+                Math.floorMod(Long.hashCode(LocalDate.of(2026, 11, 11).toEpochDay() * 2_654_435_761L), 10),
+                1, Sort.by("slug")));
+        verifyNoInteractions(random);
+    }
+
+    @Test
+    void findRandomThrowsForEmptyCatalog() {
+        when(repository.count()).thenReturn(0L);
+
+        assertThatThrownBy(() -> service.findRandom(null))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("The catalog is empty");
     }
 
     private static AppleModel mac128k() {
