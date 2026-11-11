@@ -27,10 +27,13 @@ JUnit 5 + MockMvc · JaCoCo.
 ## Package layout (package-by-feature)
 ```
 io.github.rsinghsd.macmuseum
-├── model/        AppleModel entity, repository, service, controller, DTOs
+├── model/        AppleModel entity, repository, filters (Specification), service,
+│                 CRUD + /random controllers, DTOs
 ├── family/       ProductFamily entity, repository, service, controller, DTOs
-├── timeline/     timeline grouping logic + controller (phase 3)
-├── common/       exceptions, GlobalExceptionHandler (ProblemDetail), PageResponse
+├── timeline/     groups models into CPU eras (/timeline)
+├── compare/      side-by-side comparison (/compare)
+├── common/       exceptions, GlobalExceptionHandler (ProblemDetail), PageResponse,
+│                 OpenAPI + web config
 └── MacMuseumApplication.java
 ```
 Each feature package owns its controller, service, repository, entity and DTOs.
@@ -64,8 +67,11 @@ repository.
 - Plural nouns: `/models`, `/families`.
 - Lists are paginated with Spring `Pageable` (`page`, `size`, `sort`).
 - `201 Created` + `Location` header on POST, `204 No Content` on DELETE.
-- Every endpoint is documented with springdoc annotations where defaults are
-  not self-explanatory.
+- Every endpoint has `@Operation` + `@Tag`; error responses use the reusable
+  `ApiErrorResponses.*` annotations. `OpenApiIT` fails if an endpoint is missing.
+- Filters are optional query params combined with AND; unknown filter values
+  that cannot be converted → 400, unknown family slug → empty page.
+- Randomness goes through the injectable `RandomGenerator` bean.
 
 ## Testing
 - Unit tests for services (JUnit 5 + Mockito), named `*Test`.
