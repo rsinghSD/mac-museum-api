@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -30,12 +31,18 @@ public class AppleModelController {
 
     @GetMapping
     public PageResponse<AppleModelResponse> list(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer fromYear,
+            @RequestParam(required = false) Integer toYear,
+            @RequestParam(required = false) String family,
+            @RequestParam(required = false) CpuArchitecture cpu,
+            @RequestParam(required = false) String q,
             @PageableDefault(size = 20)
             @SortDefault.SortDefaults({
                     @SortDefault(sort = "releaseYear", direction = Sort.Direction.ASC),
                     @SortDefault(sort = "name", direction = Sort.Direction.ASC)})
             Pageable pageable) {
-        return service.findAll(pageable);
+        return service.findAll(new AppleModelFilter(year, fromYear, toYear, family, cpu, q), pageable);
     }
 
     @GetMapping("/{slug}")

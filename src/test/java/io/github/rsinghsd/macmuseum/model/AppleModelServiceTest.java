@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.github.rsinghsd.macmuseum.common.BadRequestException;
@@ -17,12 +19,14 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class AppleModelServiceTest {
@@ -62,9 +66,10 @@ class AppleModelServiceTest {
     @Test
     void findAllReturnsPageResponse() {
         var pageable = PageRequest.of(0, 20, Sort.by("releaseYear"));
-        when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(mac128k()), pageable, 1));
+        when(repository.findAll(ArgumentMatchers.<Specification<AppleModel>>any(), eq(pageable)))
+                .thenReturn(new PageImpl<>(List.of(mac128k()), pageable, 1));
 
-        var page = service.findAll(pageable);
+        var page = service.findAll(AppleModelFilter.NONE, pageable);
 
         assertThat(page.content()).extracting(AppleModelResponse::slug).containsExactly("macintosh-128k");
         assertThat(page.totalElements()).isEqualTo(1);
@@ -76,10 +81,20 @@ class AppleModelServiceTest {
     void findAllRejectsUnknownSortProperty() {
         var pageable = PageRequest.of(0, 20, Sort.by("id"));
 
-        assertThatThrownBy(() -> service.findAll(pageable))
+        assertThatThrownBy(() -> service.findAll(AppleModelFilter.NONE, pageable))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Cannot sort by 'id'");
-        verify(repository, never()).findAll(pageable);
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void findAllRejectsInvertedYearRange() {
+        var filter = new AppleModelFilter(null, 2000, 1990, null, null, null);
+
+        assertThatThrownBy(() -> service.findAll(filter, PageRequest.of(0, 20)))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("fromYear (2000)");
+        verifyNoInteractions(repository);
     }
 
     @Test

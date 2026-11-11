@@ -28,9 +28,12 @@ public class AppleModelService {
         this.familyService = familyService;
     }
 
-    public PageResponse<AppleModelResponse> findAll(Pageable pageable) {
+    public PageResponse<AppleModelResponse> findAll(AppleModelFilter filter, Pageable pageable) {
+        filter.validate();
         validateSort(pageable.getSort());
-        return PageResponse.from(repository.findAll(pageable), AppleModelMapper::toResponse);
+        return PageResponse.from(
+                repository.findAll(AppleModelSpecifications.matching(filter), pageable),
+                AppleModelMapper::toResponse);
     }
 
     public AppleModelResponse findBySlug(String slug) {
