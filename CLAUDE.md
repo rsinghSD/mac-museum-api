@@ -89,6 +89,20 @@ or spec is uncertain, leave it `NULL`. Summaries are written in our own words.
 Plain HTML/CSS/vanilla JS in `src/main/resources/static`. No build step, no
 framework. Mac OS 8 "Platinum"-inspired look, mobile-first. **Do not use the
 Apple logo or any Apple-owned assets.**
+```
+static/
+├── index.html        all views as windows; one page
+├── css/platinum.css  design tokens in :root, mobile-first media queries
+├── img/icon.svg      original pixel-art icon
+└── js/
+    ├── app.js        routing (#catalog, #timeline, #compare=a,b, #model=slug) + views
+    ├── api.js        fetch wrapper; rejects with ApiError holding the ProblemDetail
+    ├── dom.js        h() element builder — text via textContent only (no innerHTML)
+    └── format.js     clock/RAM/price formatting; null → "Unknown"
+```
+- Never use `innerHTML` with API data; build nodes with `h()`.
+- Keep tap targets ≥ 36px and inputs at 16px font (prevents iOS zoom).
+- Test changes at 390px width and on desktop.
 
 ## Git
 - Conventional, imperative commit messages ("Add timeline endpoint").

@@ -7,18 +7,22 @@
 
 > A REST API and retro web catalog of Apple hardware history, from the Apple I (1976) to Apple Silicon — like a Pokédex, but for Macs.
 
-> 🚧 **Work in progress.** The full REST API is done (v0.3); the retro frontend is next. See the [roadmap](#roadmap).
+> 🚧 **Work in progress.** API and retro frontend are done (v0.4); Docker and deployment are next. See the [roadmap](#roadmap).
 
-<!-- Screenshot placeholder: replace with docs/screenshot.png once the frontend ships -->
-![Screenshot placeholder](https://placehold.co/800x450?text=Mac+Museum+screenshot+coming+soon)
+![Catalog on desktop](docs/screenshots/desktop-catalog.png)
 
-## Planned features
+<p align="center">
+  <img src="docs/screenshots/phone-compare.png" width="260" alt="Comparing the Macintosh 128K and iMac G3 on a phone">
+  <img src="docs/screenshots/phone-timeline.png" width="260" alt="Timeline by CPU era on a phone">
+</p>
+
+## Features
 - Browse ~35 iconic models with pagination and sorting
 - Filter by year, year range, product family, CPU architecture and free text
 - Chronological timeline grouped by CPU era (6502 → 68k → PowerPC → Intel → Apple Silicon)
 - Compare models side by side, and a random "Mac of the day"
 - Full CRUD for curators, with validation and RFC 7807 error responses
-- Mac OS 8 "Platinum"-inspired, mobile-first web UI
+- Mac OS 8 "Platinum"-inspired, mobile-first web UI: search, filters, detail windows, timeline, shareable comparisons
 - OpenAPI docs via Swagger UI, health checks via Actuator
 
 ## Tech stack
@@ -101,7 +105,7 @@ Example `/compare` result (Macintosh 128K vs MacBook Air M1):
 - [x] **v0.1** — Project setup, CI, docs, user stories
 - [x] **v0.2** — Domain, migrations, seed data, CRUD API with tests
 - [x] **v0.3** — Filters, timeline, compare, random, Swagger, error handling
-- [ ] **v0.4** — Retro Platinum web frontend
+- [x] **v0.4** — Retro Platinum web frontend
 - [ ] **v0.5** — Docker, prod profile
 - [ ] **v1.0** — Deployed on Render, final polish
 
