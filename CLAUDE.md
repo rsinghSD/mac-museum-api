@@ -29,8 +29,8 @@ JUnit 5 + MockMvc · JaCoCo.
 io.github.rsinghsd.macmuseum
 ├── model/        AppleModel entity, repository, service, controller, DTOs
 ├── family/       ProductFamily entity, repository, service, controller, DTOs
-├── timeline/     timeline grouping logic + controller
-├── common/       exception handling (ProblemDetail), shared config, OpenAPI
+├── timeline/     timeline grouping logic + controller (phase 3)
+├── common/       exceptions, GlobalExceptionHandler (ProblemDetail), PageResponse
 └── MacMuseumApplication.java
 ```
 Each feature package owns its controller, service, repository, entity and DTOs.
@@ -54,7 +54,10 @@ repository.
 - `spring.jpa.open-in-view=false`; fetch what you need inside the service.
 - Schema changes **only via new Flyway migrations** (`V{n}__description.sql`).
   Never edit a migration that has been merged. Hibernate runs `ddl-auto=validate`.
-- Use `java.time` and `BigDecimal` for money. Nullable price means "unknown".
+- Use `java.time` and `BigDecimal` for money. A `null` price, clock speed or
+  RAM value means "unknown".
+- Sorting is restricted to a whitelist (`AppleModelService.SORTABLE_PROPERTIES`);
+  unknown sort properties return 400 instead of a 500 from JPA.
 
 ## API conventions
 - Base path: `/api/v1`.
@@ -66,8 +69,9 @@ repository.
 
 ## Testing
 - Unit tests for services (JUnit 5 + Mockito), named `*Test`.
-- MockMvc integration tests for every endpoint, named `*IT` or
-  `*ControllerTest`, covering the happy path **and** error cases (404, 400, 409).
+- MockMvc integration tests for every endpoint, named `*IT` (run by Failsafe
+  in `verify`), covering the happy path **and** error cases (404, 400, 409).
+  They use `@SpringBootTest` + `@Transactional` so each test rolls back.
 - Test names describe behaviour: `returnsNotFoundWhenSlugIsUnknown()`.
 - Coverage target: **80%+ lines**, enforced by JaCoCo in `verify`.
 

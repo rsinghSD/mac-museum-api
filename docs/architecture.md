@@ -61,8 +61,8 @@ erDiagram
         bigint family_id FK
         varchar cpu_architecture "MOS_6502, M68K, POWERPC, INTEL_X86, ARM, APPLE_SILICON"
         varchar cpu_name
-        int clock_speed_mhz
-        int base_ram_kb
+        int clock_speed_mhz "nullable"
+        int base_ram_kb "nullable"
         text summary
     }
 ```
