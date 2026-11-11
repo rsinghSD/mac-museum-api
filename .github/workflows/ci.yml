@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   build:
+    name: mvn verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +21,7 @@ jobs:
           java-version: '21'
           cache: maven
 
+      # Includes PostgresProfileIT, which uses Testcontainers and the runner's Docker.
       - name: Build and verify
         run: mvn -B verify
 
@@ -30,3 +32,35 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
           if-no-files-found: ignore
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t mac-museum-api:ci .
+
+      - name: Start container with PostgreSQL and wait until healthy
+        run: |
+          docker network create museum
+          docker run -d --name db --network museum \
+            -e POSTGRES_DB=macmuseum -e POSTGRES_USER=macmuseum -e POSTGRES_PASSWORD=ci \
+            postgres:16-alpine
+          docker run -d --name app --network museum -p 8080:8080 \
+            -e DB_HOST=db -e DB_NAME=macmuseum -e DB_USER=macmuseum -e DB_PASSWORD=ci \
+            mac-museum-api:ci
+          for i in $(seq 40); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' app)
+            [ "$status" = healthy ] && break
+            sleep 5
+          done
+          docker logs app | tail -20
+          [ "$status" = healthy ]
+
+      - name: Smoke test
+        run: |
+          curl -fsS http://localhost:8080/actuator/health
+          curl -fsS "http://localhost:8080/api/v1/models?size=1"
+          curl -fsS -o /dev/null http://localhost:8080/

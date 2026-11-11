@@ -1,0 +1,37 @@
+# Full stack: the app (prod profile) + PostgreSQL.
+#   docker compose up --build     → http://localhost:8080
+# Credentials come from the environment or a local .env file (see .env.example).
+# The defaults below are for local development only.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-macmuseum}
+      POSTGRES_USER: ${DB_USER:-macmuseum}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-macmuseum}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-macmuseum}
+      DB_USER: ${DB_USER:-macmuseum}
+      DB_PASSWORD: ${DB_PASSWORD:-macmuseum}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    restart: unless-stopped
+
+volumes:
+  db-data:
