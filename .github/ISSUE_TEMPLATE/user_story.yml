@@ -1,0 +1,34 @@
+name: User story
+description: A user-facing requirement with acceptance criteria
+title: "US-XX — "
+labels: ["type:user-story"]
+body:
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Epic
+      options: [Browse, Search, Compare, Admin, Ops]
+    validations:
+      required: true
+  - type: textarea
+    id: story
+    attributes:
+      label: Story
+      value: |
+        **As a** <role>, **I want** <capability>, **so that** <benefit>.
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Technical notes, links, open questions.
