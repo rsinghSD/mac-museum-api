@@ -29,6 +29,8 @@ services:
       DB_NAME: ${DB_NAME:-macmuseum}
       DB_USER: ${DB_USER:-macmuseum}
       DB_PASSWORD: ${DB_PASSWORD:-macmuseum}
+      # Leave empty to make the catalog read-only (writes return 403).
+      WRITE_API_KEY: ${WRITE_API_KEY:-}
     ports:
       - "${APP_PORT:-8080}:8080"
     restart: unless-stopped

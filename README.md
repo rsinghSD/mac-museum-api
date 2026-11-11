@@ -26,7 +26,7 @@
 - **Timeline:** the whole history grouped into CPU eras: 6502 → 68k → ARM → PowerPC → Intel → Apple silicon.
 - **Compare:** 2–4 models side by side, with clock and RAM multiples and price difference.
 - **Mac of the day:** a random model, stable for everyone on the same date.
-- **Curator CRUD:** create, replace, rename and delete models, with Bean Validation.
+- **Curator CRUD:** create, replace, rename and delete models, with Bean Validation. Writes are protected by an `X-API-Key` header in production.
 - **Consistent errors:** every error is an [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807) problem detail, with field errors for invalid input.
 - **Retro UI:** a mobile-first web app inspired by the 1990s "Platinum" desktop. Plain HTML/CSS/JS, served by the same JAR.
 - **Ops-ready:** Swagger UI, Actuator health probes, a Docker image with a health check, docker-compose with PostgreSQL, and a Render Blueprint.
@@ -89,13 +89,15 @@ Base path `/api/v1`. Interactive docs at **`/swagger-ui.html`**, OpenAPI JSON at
 |--------|------|-------------|
 | GET | `/models` | Paginated list. Filters: `year`, `fromYear`, `toYear`, `family`, `cpu`, `q`; plus `page`, `size` (max 100), `sort` |
 | GET | `/models/{slug}` | One model |
-| POST | `/models` | Create (201 + `Location`) |
-| PUT | `/models/{slug}` | Replace (the slug in the body can rename it) |
-| DELETE | `/models/{slug}` | Delete (204) |
+| POST 🔑 | `/models` | Create (201 + `Location`) |
+| PUT 🔑 | `/models/{slug}` | Replace (the slug in the body can rename it) |
+| DELETE 🔑 | `/models/{slug}` | Delete (204) |
 | GET | `/families` | Product families with model counts |
 | GET | `/timeline` | Models grouped by CPU era, oldest first |
 | GET | `/compare?slugs=a,b` | 2–4 models side by side, compared with the first |
 | GET | `/random` | Random model; `?day=2026-11-11` gives a stable "Mac of the day" |
+
+🔑 = needs the `X-API-Key` header when the server has `WRITE_API_KEY` set. Locally, without a key, writes are open; with the `prod` profile and no key they return 403. In Swagger UI, use **Authorize**.
 
 CPU values: `MOS_6502`, `M68K`, `ARM`, `POWERPC`, `INTEL_X86`, `APPLE_SILICON` (case-insensitive; `apple-silicon` works too).
 
@@ -114,13 +116,13 @@ curl http://localhost:8080/api/v1/timeline
 curl "http://localhost:8080/api/v1/compare?slugs=macintosh-128k,macbook-air-m1"
 curl "http://localhost:8080/api/v1/random?day=2026-11-11"
 
-# Curate
-curl -i -X POST http://localhost:8080/api/v1/models -H 'Content-Type: application/json' -d '{
+# Curate (the X-API-Key header is only needed when WRITE_API_KEY is set)
+curl -i -X POST http://localhost:8080/api/v1/models -H "X-API-Key: $WRITE_API_KEY" -H 'Content-Type: application/json' -d '{
   "slug": "power-mac-g4-mdd", "name": "Power Mac G4 (Mirrored Drive Doors)",
   "releaseYear": 2002, "familySlug": "power-macintosh", "cpuArchitecture": "POWERPC",
   "cpuName": "PowerPC G4", "clockSpeedMhz": 867, "baseRamKb": 262144,
   "summary": "A dual-processor tower nicknamed for its two drive bays."}'
-curl -i -X DELETE http://localhost:8080/api/v1/models/power-mac-g4-mdd
+curl -i -X DELETE -H "X-API-Key: $WRITE_API_KEY" http://localhost:8080/api/v1/models/power-mac-g4-mdd
 ```
 
 A model:
@@ -160,7 +162,8 @@ Validation failures add an `errors` object mapping each field to its message.
 docker compose up --build     # http://localhost:8080
 docker compose down -v        # stop and delete the database volume
 ```
-Optional: copy `.env.example` to `.env` to change credentials or the port.
+The compose stack is read-only unless you set `WRITE_API_KEY` (e.g. `WRITE_API_KEY=secret docker compose up --build`).
+Optional: copy `.env.example` to `.env` to change credentials, the port or the key.
 
 ## Deploy
 
@@ -202,7 +205,8 @@ mac-museum-api/
 - [x] **v0.4** Retro Platinum web frontend
 - [x] **v0.5** Docker, prod profile, PostgreSQL integration test
 - [ ] **v1.0** Live on Render
-- [ ] **Next:** API-key protection for write endpoints · source citations per model · more models (Apple IIGS, Power Mac G4 MDD, Mac Studio…) · image gallery with freely licensed photos · ETag caching
+- [x] **v0.6** API-key protection for write endpoints
+- [ ] **Next:** source citations per model · more models (Apple IIGS, Power Mac G4 MDD, Mac Studio…) · image gallery with freely licensed photos · ETag caching
 
 ## License
 

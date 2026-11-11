@@ -140,6 +140,7 @@ priority, and the milestone it ships in.
 - [ ] `POST /api/v1/models` with a valid body returns `201 Created` and a `Location` header.
 - [ ] A duplicate slug returns `409 Conflict`.
 - [ ] An unknown family slug returns `400`.
+- [ ] In production, writes require the `X-API-Key` header (401 if missing or wrong).
 
 ### US-12 — Update and delete a model
 **As a** curator, **I want** to correct or remove a model,

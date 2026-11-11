@@ -115,6 +115,8 @@ proves it on real PostgreSQL.
 
 ## Cross-cutting concerns
 - **Errors**: one `@RestControllerAdvice` maps exceptions to `ProblemDetail`.
+- **Write protection**: `WriteApiKeyInterceptor` requires `X-API-Key` on write
+  methods when `WRITE_API_KEY` is set; in `prod` without a key, writes get 403.
 - **Docs**: springdoc generates OpenAPI 3 at `/v3/api-docs`, UI at `/swagger-ui.html`.
 - **Health**: Actuator `/actuator/health` used by Docker and Render health checks.
 - **Coverage**: JaCoCo report and threshold check during `mvn verify`.

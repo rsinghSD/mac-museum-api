@@ -50,6 +50,7 @@ jobs:
             postgres:16-alpine
           docker run -d --name app --network museum -p 8080:8080 \
             -e DB_HOST=db -e DB_NAME=macmuseum -e DB_USER=macmuseum -e DB_PASSWORD=ci \
+            -e WRITE_API_KEY=ci-key \
             mac-museum-api:ci
           for i in $(seq 40); do
             status=$(docker inspect -f '{{.State.Health.Status}}' app)
@@ -64,3 +65,6 @@ jobs:
           curl -fsS http://localhost:8080/actuator/health
           curl -fsS "http://localhost:8080/api/v1/models?size=1"
           curl -fsS -o /dev/null http://localhost:8080/
+          # Writes need the API key.
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE http://localhost:8080/api/v1/models/imac-g3)" = 401
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE -H 'X-API-Key: ci-key' http://localhost:8080/api/v1/models/imac-g3)" = 204

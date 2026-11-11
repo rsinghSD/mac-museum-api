@@ -73,6 +73,10 @@ repository.
 - Filters are optional query params combined with AND; unknown filter values
   that cannot be converted → 400, unknown family slug → empty page.
 - Randomness goes through the injectable `RandomGenerator` bean.
+- Write methods (POST/PUT/PATCH/DELETE under `/api/v1`) are guarded by
+  `WriteApiKeyInterceptor` (`X-API-Key` vs `WRITE_API_KEY`). Mark new write
+  operations with `@ApiErrorResponses.RequiresApiKey`. Dev/test default: open
+  without a key; `prod` default: 403 without a key.
 
 ## Testing
 - Unit tests for services (JUnit 5 + Mockito), named `*Test`.
