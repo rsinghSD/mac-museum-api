@@ -1,0 +1,42 @@
+# Production profile: PostgreSQL, configured entirely through environment variables.
+# Activate with SPRING_PROFILES_ACTIVE=prod.
+#
+#   DB_HOST, DB_PORT (default 5432), DB_NAME, DB_USER, DB_PASSWORD
+#   PORT (default 8080) — set automatically by Render
+#
+# SPRING_DATASOURCE_URL / _USERNAME / _PASSWORD still override these if set.
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  # Render and most PaaS terminate TLS at a proxy; trust X-Forwarded-* so Location headers use https.
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+    mime-types: application/json,application/problem+json,text/html,text/css,text/javascript,application/javascript,image/svg+xml
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
