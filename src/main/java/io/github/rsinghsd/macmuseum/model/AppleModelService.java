@@ -6,6 +6,7 @@ import io.github.rsinghsd.macmuseum.common.PageResponse;
 import io.github.rsinghsd.macmuseum.common.ResourceNotFoundException;
 import io.github.rsinghsd.macmuseum.family.ProductFamily;
 import io.github.rsinghsd.macmuseum.family.ProductFamilyService;
+import java.util.List;
 import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,6 +35,13 @@ public class AppleModelService {
         return PageResponse.from(
                 repository.findAll(AppleModelSpecifications.matching(filter), pageable),
                 AppleModelMapper::toResponse);
+    }
+
+    /** Every model ordered by release year, then name. Used by the timeline. */
+    public List<AppleModelResponse> findAllChronological() {
+        return repository.findAll(Sort.by("releaseYear", "name")).stream()
+                .map(AppleModelMapper::toResponse)
+                .toList();
     }
 
     public AppleModelResponse findBySlug(String slug) {
