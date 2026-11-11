@@ -1,6 +1,7 @@
 package io.github.rsinghsd.macmuseum;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,6 +56,11 @@ class PostgresProfileIT {
         mvc.perform(get("/api/v1/timeline")).andExpect(jsonPath("$.eras.length()").value(6));
         mvc.perform(get("/api/v1/compare").param("slugs", "macintosh-128k,imac-g3"))
                 .andExpect(jsonPath("$.comparisons[0].ramRatio").value(256.0));
+    }
+
+    @Test
+    void rejectsWritesWhenNoApiKeyIsConfigured() throws Exception {
+        mvc.perform(delete("/api/v1/models/imac-g3")).andExpect(status().isForbidden());
     }
 
     @Test

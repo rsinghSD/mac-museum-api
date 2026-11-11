@@ -3,6 +3,7 @@
 #
 #   DB_HOST, DB_PORT (default 5432), DB_NAME, DB_USER, DB_PASSWORD
 #   PORT (default 8080) — set automatically by Render
+#   WRITE_API_KEY — required for POST/PUT/DELETE (sent as X-API-Key)
 #
 # SPRING_DATASOURCE_URL / _USERNAME / _PASSWORD still override these if set.
 spring:
@@ -35,6 +36,11 @@ management:
       probes:
         enabled: true
       show-details: never
+
+app:
+  security:
+    # Writes need WRITE_API_KEY in production; without it they are rejected with 403.
+    allow-unauthenticated-writes: false
 
 logging:
   level:

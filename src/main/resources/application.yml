@@ -31,3 +31,8 @@ springdoc:
 
 app:
   version: '@project.version@'
+  security:
+    # Set WRITE_API_KEY to require an X-API-Key header on POST/PUT/DELETE.
+    write-api-key: ${WRITE_API_KEY:}
+    # Without a key, writes stay open for local development. The prod profile turns this off.
+    allow-unauthenticated-writes: true
