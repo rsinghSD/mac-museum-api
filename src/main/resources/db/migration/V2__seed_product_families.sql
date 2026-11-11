@@ -1,0 +1,17 @@
+INSERT INTO product_family (slug, name, description) VALUES
+('apple-i-ii',      'Apple I & II',     'The hobbyist and home computers that started the company, built around the MOS 6502.'),
+('lisa',            'Lisa',             'An expensive business machine that pioneered the graphical interface at Apple before the Macintosh.'),
+('macintosh',       'Macintosh',        'The original Mac line: compact all-in-ones and modular desktops of the 68k era.'),
+('powerbook',       'PowerBook',        'Apple''s professional laptops from 1991 until the move to Intel.'),
+('newton',          'Newton',           'An early personal digital assistant platform with handwriting recognition.'),
+('power-macintosh', 'Power Macintosh',  'Desktop Macs built on PowerPC processors, from the first 601 machines to the G5.'),
+('imac',            'iMac',             'Colourful, then sleek, all-in-one desktops aimed at home users.'),
+('ibook',           'iBook',            'Consumer laptops of the PowerPC era, known for bright plastic shells.'),
+('ipod',            'iPod',             'Portable digital music players that reshaped how people carried music.'),
+('mac-mini',        'Mac mini',         'A small, headless desktop Mac designed to be the cheapest way into the platform.'),
+('macbook',         'MacBook',          'Consumer laptops of the Intel era.'),
+('macbook-pro',     'MacBook Pro',      'Professional laptops that replaced the PowerBook.'),
+('macbook-air',     'MacBook Air',      'Thin and light laptops, later Apple''s most popular Mac.'),
+('mac-pro',         'Mac Pro',          'High-end workstation desktops for professional workloads.'),
+('iphone',          'iPhone',           'Touchscreen smartphones that defined the modern mobile era.'),
+('ipad',            'iPad',             'Touchscreen tablets sitting between the phone and the laptop.');
