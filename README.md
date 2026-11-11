@@ -1,5 +1,7 @@
 # Mac Museum API
 
+*made this project on the subway to uni with claude lol*
+
 [![CI](https://github.com/rsinghSD/mac-museum-api/actions/workflows/ci.yml/badge.svg)](https://github.com/rsinghSD/mac-museum-api/actions/workflows/ci.yml)
 ![Java 21](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
 ![Spring Boot 3.5](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F?logo=springboot)
