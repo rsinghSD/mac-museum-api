@@ -86,6 +86,10 @@
                 <option value="launchPriceUsd,desc">Most expensive</option>
               </select>
             </label>
+            <label class="field field-check">
+              <input type="checkbox" name="bootable" value="true">
+              <span>Bootable only</span>
+            </label>
             <div class="filters-actions">
               <button type="reset" class="btn">Clear</button>
             </div>
@@ -142,6 +146,16 @@
       <h2 class="title" id="detail-title">Model</h2>
     </header>
     <div class="window-body" id="detail-body"></div>
+  </dialog>
+
+  <!-- ============================== Emulator ============================== -->
+  <dialog class="window dialog emulator-dialog" id="emulator" aria-labelledby="emulator-title">
+    <header class="titlebar">
+      <button type="button" class="closebox" id="emulator-close" aria-label="Shut down"></button>
+      <h2 class="title" id="emulator-title">Emulator</h2>
+    </header>
+    <div class="emulator-frame" id="emulator-frame"></div>
+    <p class="emulator-credit small" id="emulator-credit"></p>
   </dialog>
 
   <!-- ============================== Alert ============================== -->

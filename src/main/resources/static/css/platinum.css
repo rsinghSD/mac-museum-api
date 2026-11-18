@@ -289,6 +289,69 @@ select {
 .chip[data-cpu="INTEL_X86"] { background: #d8c8ec; }
 .chip[data-cpu="APPLE_SILICON"] { background: #f5f0b0; }
 .chip-maker { margin-left: 6px; background: var(--ink); color: var(--highlight); }
+.chip-boot { margin-left: 6px; background: #c8f0c8; }
+
+.card-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  margin-bottom: 8px;
+  background: var(--highlight);
+  border: 1px solid var(--shadow);
+}
+
+.field-check { display: flex; align-items: center; gap: 8px; align-self: end; min-height: 36px; }
+.field-check input { width: 20px; min-height: 20px; margin: 0; box-shadow: none; }
+
+/* --------------------------------------------------------------- photo ---- */
+
+.photo { margin: 0 0 10px; }
+.photo img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  background: var(--highlight);
+  border: 1px solid var(--ink);
+}
+.photo figcaption { margin-top: 4px; color: var(--dark); overflow-wrap: anywhere; }
+.photo-missing {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  font: 13px var(--pixel-font);
+  color: var(--dark);
+  background: repeating-linear-gradient(45deg, var(--platinum-light) 0 6px, var(--platinum) 6px 12px);
+  border: 1px dashed var(--shadow);
+}
+
+/* ------------------------------------------------------------ emulator ---- */
+
+.emulator-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--platinum-light);
+  border: 1px solid var(--ink);
+  box-shadow: inset 1px 1px var(--highlight), inset -1px -1px var(--shadow);
+}
+.emulator-box h3 { margin: 0 0 4px; font: 700 16px var(--pixel-font); }
+.emulator-box p { margin: 4px 0; }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; }
+
+.emulator-dialog { display: none; }
+.emulator-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+}
+.emulator-frame { flex: 1; min-height: 0; background: #000; margin: 0 3px; }
+.emulator-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.emulator-credit { margin: 0 3px 3px; padding: 6px 10px; background: var(--platinum); }
 
 .pager {
   display: flex;
@@ -440,10 +503,15 @@ select {
 
 @media (min-width: 760px) {
   .menubar-clock { display: block; }
-  .filters { grid-template-columns: 2fr 1.3fr 1.3fr .8fr .8fr 1.2fr auto; }
+  .filters { grid-template-columns: 2fr 1.3fr 1.3fr .8fr .8fr 1.2fr auto auto; }
   .field-wide { grid-column: auto; }
   .cards { grid-template-columns: repeat(3, 1fr); }
-  .dialog {
+  .emulator-dialog[open] {
+    width: min(1100px, 96vw);
+    height: min(860px, 94vh);
+    margin: auto;
+  }
+  .dialog:not(.emulator-dialog) {
     width: min(640px, 92vw);
     height: auto;
     max-height: 88vh;

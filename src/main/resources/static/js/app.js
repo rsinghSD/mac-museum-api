@@ -123,6 +123,7 @@ function filterParams() {
     cpu: data.get('cpu'),
     fromYear: data.get('fromYear'),
     toYear: data.get('toYear'),
+    bootable: data.get('bootable'),
     sort: data.get('sort'),
     page: state.page,
     size: 24,
@@ -155,11 +156,15 @@ function renderCards(models) {
   for (const model of models) {
     list.append(h('li', {},
       h('button', { type: 'button', class: 'card', onclick: modelLink(model.slug) },
+        model.image
+          ? h('img', { class: 'card-thumb', src: model.image.url, alt: '', loading: 'lazy', decoding: 'async' })
+          : null,
         h('span', { class: 'card-title' }, model.name),
         h('span', { class: 'card-meta' }, modelMeta(model)),
         h('span', { class: 'card-meta' }, `${model.cpuName} · ${fmt.clock(model.clockSpeedMhz)}`),
         cpuChip(model),
-        makerChip(model))));
+        makerChip(model),
+        model.emulator ? h('span', { class: 'chip chip-boot' }, '▶ Bootable') : null)));
   }
 }
 
@@ -203,6 +208,7 @@ async function showDetail(slug) {
     const model = await api.model(slug);
     $('#detail-title').textContent = model.name;
     clear($('#detail-body')).append(
+      photo(model),
       h('p', {}, model.summary),
       h('table', { class: 'specs' },
         h('tbody', {},
@@ -214,6 +220,7 @@ async function showDetail(slug) {
           specRow('Clock speed', fmt.clock(model.clockSpeedMhz)),
           specRow('Base RAM', fmt.ram(model.baseRamKb)),
           specRow('Launch price', fmt.price(model.launchPriceUsd)))),
+      emulatorSection(model),
       h('div', { class: 'detail-actions' },
         h('button', {
           type: 'button',
@@ -226,6 +233,64 @@ async function showDetail(slug) {
   } catch (error) {
     handleError(error);
   }
+}
+
+/** Photo with the attribution its free license requires, or a placeholder. */
+function photo(model) {
+  if (!model.image) {
+    return h('div', { class: 'photo photo-missing' }, 'No freely licensed photo yet');
+  }
+  const { url, credit, license, sourceUrl } = model.image;
+  return h('figure', { class: 'photo' },
+    h('img', { src: url, alt: `Photo of the ${model.name}`, decoding: 'async' }),
+    h('figcaption', { class: 'small' },
+      'Photo: ', credit, ' · ', license, ' · ',
+      sourceUrl ? h('a', { href: sourceUrl, target: '_blank', rel: 'noopener' }, 'Wikimedia Commons') : 'Wikimedia Commons'));
+}
+
+/** Only Infinite Mac's /embed endpoint is ever placed in an iframe (the API enforces this too). */
+const EMBED_PREFIX = 'https://infinitemac.org/embed?';
+
+function emulatorSection(model) {
+  const emu = model.emulator;
+  if (!emu) return null;
+  const canEmbed = typeof emu.embedUrl === 'string' && emu.embedUrl.startsWith(EMBED_PREFIX);
+  return h('section', { class: 'emulator-box' },
+    h('h3', {}, 'Try it'),
+    h('p', {}, emu.label),
+    emu.exactMachine ? null : h('p', { class: 'muted small' },
+      'This exact machine isn’t emulated, so this boots the closest one available.'),
+    h('div', { class: 'detail-actions' },
+      canEmbed
+        ? h('button', { type: 'button', class: 'btn btn-default', onclick: () => openEmulator(model) }, '▶ Boot')
+        : null,
+      h('a', { class: 'btn', href: emu.url, target: '_blank', rel: 'noopener' }, `Open on ${emu.provider} ↗`)),
+    h('p', { class: 'muted small' },
+      `Runs in your browser via ${emu.provider}. It downloads disk images (often tens of MB), so Wi-Fi is best.`));
+}
+
+const emulatorDialog = $('#emulator');
+
+function openEmulator(model) {
+  const emu = model.emulator;
+  if (!emu?.embedUrl?.startsWith(EMBED_PREFIX)) return;
+  $('#emulator-title').textContent = emu.label;
+  clear($('#emulator-frame')).append(h('iframe', {
+    src: emu.embedUrl,
+    title: `${emu.label} (${emu.provider})`,
+    allow: 'cross-origin-isolated',
+    referrerpolicy: 'no-referrer',
+  }));
+  clear($('#emulator-credit')).append(
+    'Emulation by ', h('a', { href: 'https://infinitemac.org', target: '_blank', rel: 'noopener' }, 'Infinite Mac'),
+    ', a project by Mihai Parparita. Closing this window shuts the machine down.');
+  emulatorDialog.showModal();
+}
+
+function setupEmulator() {
+  $('#emulator-close').addEventListener('click', () => emulatorDialog.close());
+  // Removing the iframe stops the emulator and its downloads.
+  emulatorDialog.addEventListener('close', () => clear($('#emulator-frame')));
 }
 
 function specRow(label, value) {
@@ -410,6 +475,7 @@ function init() {
   $('#alert-ok').addEventListener('click', () => { $('#alert').hidden = true; });
   setupCatalog();
   setupDetail();
+  setupEmulator();
   setupCompare();
   startClock();
   // popstate fires for back/forward and for in-page #links, so one listener covers both.
