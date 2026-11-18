@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -100,6 +102,15 @@ class AppleModelFilterIT {
                 .andExpect(jsonPath("$.content[*].family.slug", everyItem(is("contemporaries"))));
         mvc.perform(get("/api/v1/models").param("manufacturer", "Apple").param("size", "1"))
                 .andExpect(jsonPath("$.content[0].manufacturer").value("Apple"));
+    }
+
+    @Test
+    void filtersBootableModels() throws Exception {
+        mvc.perform(get("/api/v1/models").param("bootable", "true").param("size", "100"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].emulator.url", everyItem(startsWith("https://"))))
+                .andExpect(jsonPath("$.content[*].slug", hasItem("macintosh-se-30")))
+                .andExpect(jsonPath("$.content[*].slug", not(hasItem("iphone"))));
     }
 
     @Test

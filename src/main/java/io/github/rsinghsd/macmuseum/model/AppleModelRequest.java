@@ -1,5 +1,6 @@
 package io.github.rsinghsd.macmuseum.model;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
@@ -47,5 +48,13 @@ public record AppleModelRequest(
 
         /** Optional; defaults to "Apple". */
         @Size(max = 60)
-        String manufacturer) {
+        String manufacturer,
+
+        /** Optional freely licensed photo. */
+        @Valid
+        ImageDto image,
+
+        /** Optional in-browser emulator. */
+        @Valid
+        EmulatorDto emulator) {
 }

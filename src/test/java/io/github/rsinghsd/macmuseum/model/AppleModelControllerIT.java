@@ -1,6 +1,7 @@
 package io.github.rsinghsd.macmuseum.model;
 
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -102,6 +103,28 @@ class AppleModelControllerIT {
         }
 
         @Test
+        void returnsImageAndExactEmulator() throws Exception {
+            mvc.perform(get("/api/v1/models/macintosh-128k"))
+                    .andExpect(jsonPath("$.image.url").value(matchesPattern("https://(upload|thumb)\\.wikimedia\\.org/.+")))
+                    .andExpect(jsonPath("$.image.license").isNotEmpty())
+                    .andExpect(jsonPath("$.image.credit").isNotEmpty())
+                    .andExpect(jsonPath("$.emulator.provider").value("Infinite Mac"))
+                    .andExpect(jsonPath("$.emulator.label").value("System 1.0 on an emulated Mac 128K"))
+                    .andExpect(jsonPath("$.emulator.embedUrl")
+                            .value("https://infinitemac.org/embed?disk=System%201.0&machine=Mac%20128K"))
+                    .andExpect(jsonPath("$.emulator.url")
+                            .value("https://infinitemac.org/run?disk=System%201.0&machine=Mac%20128K"))
+                    .andExpect(jsonPath("$.emulator.exactMachine").value(true));
+        }
+
+        @Test
+        void returnsNullImageAndEmulatorWhenUnavailable() throws Exception {
+            mvc.perform(get("/api/v1/models/mac-pro-2019"))
+                    .andExpect(jsonPath("$.image").isEmpty())
+                    .andExpect(jsonPath("$.emulator").isEmpty());
+        }
+
+        @Test
         void returnsNullPriceWhenUnknown() throws Exception {
             mvc.perform(get("/api/v1/models/macintosh-se"))
                     .andExpect(status().isOk())
@@ -133,6 +156,34 @@ class AppleModelControllerIT {
                     .andExpect(jsonPath("$.manufacturer").value("Apple"));
 
             mvc.perform(get("/api/v1/models/power-mac-g4-test-entry")).andExpect(status().isOk());
+        }
+
+        @Test
+        void storesImageAndEmulator() throws Exception {
+            String body = VALID_BODY.replace("\"summary\":", """
+                    "image": {"url": "https://upload.wikimedia.org/x.jpg", "credit": "Someone",
+                              "license": "CC BY 4.0", "sourceUrl": "https://commons.wikimedia.org/wiki/File:X.jpg"},
+                    "emulator": {"provider": "Infinite Mac", "label": "Mac OS 9.0 on an emulated G4",
+                                 "url": "https://infinitemac.org/run?disk=Mac%20OS%209.0",
+                                 "embedUrl": "https://infinitemac.org/embed?disk=Mac%20OS%209.0", "exactMachine": false},
+                    "summary":""");
+            mvc.perform(post("/api/v1/models").contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.image.credit").value("Someone"))
+                    .andExpect(jsonPath("$.emulator.exactMachine").value(false));
+        }
+
+        @Test
+        void rejectsEmbedUrlOutsideInfiniteMacAndNonHttpsImages() throws Exception {
+            String body = VALID_BODY.replace("\"summary\":", """
+                    "image": {"url": "http://example.com/x.jpg", "credit": "Someone", "license": "CC BY 4.0"},
+                    "emulator": {"provider": "Evil", "label": "x", "url": "https://example.com",
+                                 "embedUrl": "https://example.com/phish", "exactMachine": true},
+                    "summary":""");
+            mvc.perform(post("/api/v1/models").contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors['image.url']").value("must be an https URL"))
+                    .andExpect(jsonPath("$.errors['emulator.embedUrl']").exists());
         }
 
         @Test

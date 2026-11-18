@@ -59,13 +59,15 @@ public class AppleModelController {
             @Parameter(description = "Manufacturer, case-insensitive. Apple, or e.g. IBM for OS/2-era contemporaries",
                     example = "Apple")
             @RequestParam(required = false) String manufacturer,
+            @Parameter(description = "true: only models you can boot in an in-browser emulator", example = "true")
+            @RequestParam(required = false) Boolean bootable,
             @ParameterObject
             @PageableDefault(size = 20)
             @SortDefault.SortDefaults({
                     @SortDefault(sort = "releaseYear", direction = Sort.Direction.ASC),
                     @SortDefault(sort = "name", direction = Sort.Direction.ASC)})
             Pageable pageable) {
-        return service.findAll(new AppleModelFilter(year, fromYear, toYear, family, cpu, q, manufacturer), pageable);
+        return service.findAll(new AppleModelFilter(year, fromYear, toYear, family, cpu, q, manufacturer, bootable), pageable);
     }
 
     @GetMapping("/{slug}")

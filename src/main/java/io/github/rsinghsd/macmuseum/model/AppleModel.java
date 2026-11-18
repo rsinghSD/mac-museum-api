@@ -2,6 +2,7 @@ package io.github.rsinghsd.macmuseum.model;
 
 import io.github.rsinghsd.macmuseum.family.ProductFamily;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -61,6 +62,12 @@ public class AppleModel {
     /** Maker of the machine; {@value #APPLE} for Apple products, e.g. "IBM" for contemporaries. */
     @Column(nullable = false, length = 60)
     private String manufacturer = APPLE;
+
+    @Embedded
+    private ModelImage image;
+
+    @Embedded
+    private ModelEmulator emulator;
 
     protected AppleModel() {
         // for JPA
@@ -167,5 +174,21 @@ public class AppleModel {
 
     public void setManufacturer(String manufacturer) {
         this.manufacturer = manufacturer;
+    }
+
+    public ModelImage getImage() {
+        return image;
+    }
+
+    public void setImage(ModelImage image) {
+        this.image = image;
+    }
+
+    public ModelEmulator getEmulator() {
+        return emulator;
+    }
+
+    public void setEmulator(ModelEmulator emulator) {
+        this.emulator = emulator;
     }
 }

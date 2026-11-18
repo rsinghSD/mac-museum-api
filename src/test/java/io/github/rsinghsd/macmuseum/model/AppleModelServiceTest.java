@@ -95,7 +95,7 @@ class AppleModelServiceTest {
 
     @Test
     void findAllRejectsInvertedYearRange() {
-        var filter = new AppleModelFilter(null, 2000, 1990, null, null, null, null);
+        var filter = new AppleModelFilter(null, 2000, 1990, null, null, null, null, null);
 
         assertThatThrownBy(() -> service.findAll(filter, PageRequest.of(0, 20)))
                 .isInstanceOf(BadRequestException.class)
@@ -140,7 +140,7 @@ class AppleModelServiceTest {
         when(repository.findBySlug("macintosh-128k")).thenReturn(Optional.of(existing));
         when(familyService.findEntityBySlug("macintosh")).thenReturn(Optional.of(MACINTOSH));
         var changed = new AppleModelRequest("macintosh-128k", "Macintosh", 1984, null, "macintosh",
-                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "Updated summary", null);
+                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "Updated summary", null, null, null);
 
         AppleModelResponse response = service.update("macintosh-128k", changed);
 
@@ -258,6 +258,6 @@ class AppleModelServiceTest {
 
     private static AppleModelRequest request(String slug, String familySlug) {
         return new AppleModelRequest(slug, "Macintosh 128K", 1984, new BigDecimal("2495.00"), familySlug,
-                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "The original Mac.", null);
+                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "The original Mac.", null, null, null);
     }
 }

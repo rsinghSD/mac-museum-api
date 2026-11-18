@@ -43,6 +43,9 @@ final class AppleModelSpecifications {
                 predicates.add(cb.equal(cb.lower(root.get("manufacturer")),
                         filter.manufacturer().trim().toLowerCase(Locale.ROOT)));
             }
+            if (Boolean.TRUE.equals(filter.bootable())) {
+                predicates.add(cb.isNotNull(root.get("emulator").get("url")));
+            }
             return cb.and(predicates.toArray(Predicate[]::new));
         };
     }

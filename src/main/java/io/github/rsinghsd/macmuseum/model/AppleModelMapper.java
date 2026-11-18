@@ -21,7 +21,9 @@ final class AppleModelMapper {
                 model.getClockSpeedMhz(),
                 model.getBaseRamKb(),
                 model.getSummary(),
-                model.getManufacturer());
+                model.getManufacturer(),
+                ImageDto.from(model.getImage()),
+                EmulatorDto.from(model.getEmulator()));
     }
 
     static AppleModel toEntity(AppleModelRequest request, ProductFamily family) {
@@ -31,6 +33,7 @@ final class AppleModelMapper {
         model.setClockSpeedMhz(request.clockSpeedMhz());
         model.setBaseRamKb(request.baseRamKb());
         model.setManufacturer(manufacturerOrDefault(request));
+        applyMedia(model, request);
         return model;
     }
 
@@ -46,6 +49,12 @@ final class AppleModelMapper {
         model.setBaseRamKb(request.baseRamKb());
         model.setSummary(request.summary());
         model.setManufacturer(manufacturerOrDefault(request));
+        applyMedia(model, request);
+    }
+
+    private static void applyMedia(AppleModel model, AppleModelRequest request) {
+        model.setImage(request.image() == null ? null : request.image().toEmbeddable());
+        model.setEmulator(request.emulator() == null ? null : request.emulator().toEmbeddable());
     }
 
     private static String manufacturerOrDefault(AppleModelRequest request) {
