@@ -106,6 +106,14 @@ or spec is uncertain, leave it `NULL`. Summaries are written in our own words.
 - Non-Apple machines (`manufacturer` other than `Apple`) belong only in the
   `contemporaries` family. They appear in the catalog, search, detail and
   compare, but never in `/timeline` or `/random` ("Mac of the day").
+- **Photos** come only from Wikimedia Commons with a free license (CC0, public
+  domain, CC BY, CC BY-SA), always with credit, license and source page. Use
+  a photo only if it shows that model or a physically identical sibling;
+  otherwise leave the image empty. Never use Apple press images.
+- **Emulators**: `emulator.embedUrl` may only be an Infinite Mac `/embed` URL
+  (validated in `EmulatorDto` and again in the frontend). Use Infinite Mac's
+  exact machine and disk names from its source. If the machine is not this
+  exact model, set `exactMachine=false` and say "closest machine" in the label.
 
 ## Frontend
 Plain HTML/CSS/vanilla JS in `src/main/resources/static`. No build step, no
