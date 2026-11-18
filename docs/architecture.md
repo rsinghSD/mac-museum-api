@@ -64,6 +64,7 @@ erDiagram
         int clock_speed_mhz "nullable"
         int base_ram_kb "nullable"
         text summary
+        varchar manufacturer "Apple, or e.g. IBM for contemporaries"
     }
 ```
 

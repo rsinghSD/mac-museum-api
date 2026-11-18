@@ -23,7 +23,7 @@ class WriteApiKeyIT {
     private static final String PROBLEM_JSON = "application/problem+json";
 
     private static final String BODY = """
-            {"slug": "apple-iigs", "name": "Apple IIGS", "releaseYear": 1986, "familySlug": "apple-i-ii",
+            {"slug": "apple-iigs-test-entry", "name": "Apple IIGS (test entry)", "releaseYear": 1986, "familySlug": "apple-i-ii",
              "cpuArchitecture": "MOS_6502", "cpuName": "WDC 65C816", "summary": "A 16-bit Apple II."}
             """;
 
@@ -63,7 +63,7 @@ class WriteApiKeyIT {
             mvc.perform(post("/api/v1/models").header("X-API-Key", "test-key")
                             .contentType(MediaType.APPLICATION_JSON).content(BODY))
                     .andExpect(status().isCreated());
-            mvc.perform(delete("/api/v1/models/apple-iigs").header("X-API-Key", "test-key"))
+            mvc.perform(delete("/api/v1/models/apple-iigs-test-entry").header("X-API-Key", "test-key"))
                     .andExpect(status().isNoContent());
         }
     }

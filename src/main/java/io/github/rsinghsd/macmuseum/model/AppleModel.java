@@ -19,6 +19,8 @@ import java.math.BigDecimal;
 @Table(name = "apple_model")
 public class AppleModel {
 
+    public static final String APPLE = "Apple";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,6 +57,10 @@ public class AppleModel {
 
     @Column(nullable = false, length = 2000)
     private String summary;
+
+    /** Maker of the machine; {@value #APPLE} for Apple products, e.g. "IBM" for contemporaries. */
+    @Column(nullable = false, length = 60)
+    private String manufacturer = APPLE;
 
     protected AppleModel() {
         // for JPA
@@ -153,5 +159,13 @@ public class AppleModel {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 }

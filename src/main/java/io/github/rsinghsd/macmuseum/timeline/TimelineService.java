@@ -24,7 +24,7 @@ public class TimelineService {
     }
 
     public TimelineResponse build() {
-        return build(modelService.findAllChronological());
+        return build(modelService.findAppleModelsChronological());
     }
 
     /** Pure grouping logic, separated from data access so it can be unit tested directly. */

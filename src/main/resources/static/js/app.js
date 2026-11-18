@@ -76,6 +76,12 @@ function modelMeta(model) {
   return `${model.releaseYear} · ${model.family.name}`;
 }
 
+/** Badge for non-Apple machines (OS/2-era contemporaries), so they are never mistaken for Apple products. */
+function makerChip(model) {
+  if (!model.manufacturer || model.manufacturer === 'Apple') return null;
+  return h('span', { class: 'chip chip-maker', title: 'Not an Apple product: shown for context' }, `${model.manufacturer} · contemporary`);
+}
+
 function cpuChip(model) {
   return h('span', { class: 'chip', dataset: { cpu: model.cpuArchitecture } }, fmt.cpuLabel(model.cpuArchitecture));
 }
@@ -152,7 +158,8 @@ function renderCards(models) {
         h('span', { class: 'card-title' }, model.name),
         h('span', { class: 'card-meta' }, modelMeta(model)),
         h('span', { class: 'card-meta' }, `${model.cpuName} · ${fmt.clock(model.clockSpeedMhz)}`),
-        cpuChip(model))));
+        cpuChip(model),
+        makerChip(model))));
   }
 }
 
@@ -200,6 +207,7 @@ async function showDetail(slug) {
       h('table', { class: 'specs' },
         h('tbody', {},
           specRow('Released', model.releaseYear),
+          specRow('Maker', model.manufacturer ?? 'Apple'),
           specRow('Family', model.family.name),
           specRow('Architecture', fmt.cpuLabel(model.cpuArchitecture)),
           specRow('Processor', model.cpuName),
@@ -324,6 +332,7 @@ async function renderComparison() {
         h('th', { scope: 'col' }, right.name))),
       h('tbody', {},
         compareRow('Year', left.releaseYear, right.releaseYear, String),
+        compareRow('Maker', left.manufacturer ?? 'Apple', right.manufacturer ?? 'Apple'),
         compareRow('Family', left.family.name, right.family.name),
         compareRow('CPU', fmt.cpuLabel(left.cpuArchitecture), fmt.cpuLabel(right.cpuArchitecture)),
         compareRow('Processor', left.cpuName, right.cpuName),

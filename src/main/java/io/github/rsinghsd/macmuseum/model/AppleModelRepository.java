@@ -22,6 +22,14 @@ public interface AppleModelRepository extends JpaRepository<AppleModel, Long>, J
 
     boolean existsBySlug(String slug);
 
+    long countByManufacturer(String manufacturer);
+
+    @EntityGraph(attributePaths = "family")
+    List<AppleModel> findByManufacturer(String manufacturer, Sort sort);
+
+    @EntityGraph(attributePaths = "family")
+    Page<AppleModel> findByManufacturer(String manufacturer, Pageable pageable);
+
     /** Overridden to fetch the family in the same query and avoid N+1 selects. */
     @Override
     @EntityGraph(attributePaths = "family")

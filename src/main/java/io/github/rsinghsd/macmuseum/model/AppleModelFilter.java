@@ -10,7 +10,8 @@ import io.github.rsinghsd.macmuseum.common.BadRequestException;
  * @param toYear   inclusive upper bound of the release year
  * @param family   product family slug
  * @param cpu      CPU architecture
- * @param q        case-insensitive text matched against name, CPU name and summary
+ * @param q            case-insensitive text matched against name, CPU name and summary
+ * @param manufacturer maker, case-insensitive (e.g. "Apple", "IBM")
  */
 public record AppleModelFilter(
         Integer year,
@@ -18,9 +19,10 @@ public record AppleModelFilter(
         Integer toYear,
         String family,
         CpuArchitecture cpu,
-        String q) {
+        String q,
+        String manufacturer) {
 
-    public static final AppleModelFilter NONE = new AppleModelFilter(null, null, null, null, null, null);
+    public static final AppleModelFilter NONE = new AppleModelFilter(null, null, null, null, null, null, null);
 
     /** Rejects contradictory criteria. */
     public void validate() {

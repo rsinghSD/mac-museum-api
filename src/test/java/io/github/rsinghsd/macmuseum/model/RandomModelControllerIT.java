@@ -41,6 +41,16 @@ class RandomModelControllerIT {
     }
 
     @Test
+    void neverPicksNonAppleContemporaries() throws Exception {
+        for (int day = 1; day <= 60; day++) {
+            String json = mvc.perform(get("/api/v1/random")
+                            .param("day", java.time.LocalDate.of(2026, 1, 1).plusDays(day).toString()))
+                    .andReturn().getResponse().getContentAsString();
+            Assertions.assertThat((String) JsonPath.read(json, "$.manufacturer")).isEqualTo("Apple");
+        }
+    }
+
+    @Test
     void rejectsInvalidDay() throws Exception {
         mvc.perform(get("/api/v1/random").param("day", "yesterday"))
                 .andExpect(status().isBadRequest())

@@ -95,7 +95,7 @@ class AppleModelServiceTest {
 
     @Test
     void findAllRejectsInvertedYearRange() {
-        var filter = new AppleModelFilter(null, 2000, 1990, null, null, null);
+        var filter = new AppleModelFilter(null, 2000, 1990, null, null, null, null);
 
         assertThatThrownBy(() -> service.findAll(filter, PageRequest.of(0, 20)))
                 .isInstanceOf(BadRequestException.class)
@@ -140,7 +140,7 @@ class AppleModelServiceTest {
         when(repository.findBySlug("macintosh-128k")).thenReturn(Optional.of(existing));
         when(familyService.findEntityBySlug("macintosh")).thenReturn(Optional.of(MACINTOSH));
         var changed = new AppleModelRequest("macintosh-128k", "Macintosh", 1984, null, "macintosh",
-                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "Updated summary");
+                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "Updated summary", null);
 
         AppleModelResponse response = service.update("macintosh-128k", changed);
 
@@ -216,9 +216,9 @@ class AppleModelServiceTest {
 
     @Test
     void findRandomUsesGeneratorWithoutDay() {
-        when(repository.count()).thenReturn(10L);
+        when(repository.countByManufacturer("Apple")).thenReturn(10L);
         when(random.nextInt(10)).thenReturn(7);
-        when(repository.findAll(PageRequest.of(7, 1, Sort.by("slug"))))
+        when(repository.findByManufacturer("Apple", PageRequest.of(7, 1, Sort.by("slug"))))
                 .thenReturn(new PageImpl<>(List.of(mac128k())));
 
         assertThat(service.findRandom(null).slug()).isEqualTo("macintosh-128k");
@@ -226,21 +226,21 @@ class AppleModelServiceTest {
 
     @Test
     void findRandomIsDeterministicForADay() {
-        when(repository.count()).thenReturn(10L);
-        when(repository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(mac128k())));
+        when(repository.countByManufacturer("Apple")).thenReturn(10L);
+        when(repository.findByManufacturer(eq("Apple"), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(mac128k())));
 
         service.findRandom(LocalDate.of(2026, 11, 11));
         service.findRandom(LocalDate.of(2026, 11, 11));
 
-        verify(repository, times(2)).findAll(PageRequest.of(
+        verify(repository, times(2)).findByManufacturer(eq("Apple"), eq(PageRequest.of(
                 Math.floorMod(Long.hashCode(LocalDate.of(2026, 11, 11).toEpochDay() * 2_654_435_761L), 10),
-                1, Sort.by("slug")));
+                1, Sort.by("slug"))));
         verifyNoInteractions(random);
     }
 
     @Test
     void findRandomThrowsForEmptyCatalog() {
-        when(repository.count()).thenReturn(0L);
+        when(repository.countByManufacturer("Apple")).thenReturn(0L);
 
         assertThatThrownBy(() -> service.findRandom(null))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -258,6 +258,6 @@ class AppleModelServiceTest {
 
     private static AppleModelRequest request(String slug, String familySlug) {
         return new AppleModelRequest(slug, "Macintosh 128K", 1984, new BigDecimal("2495.00"), familySlug,
-                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "The original Mac.");
+                CpuArchitecture.M68K, "Motorola 68000", 8, 128, "The original Mac.", null);
     }
 }

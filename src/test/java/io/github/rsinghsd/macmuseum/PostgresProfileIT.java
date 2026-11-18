@@ -52,7 +52,9 @@ class PostgresProfileIT {
 
     @Test
     void familyCountsTimelineAndCompareWorkOnPostgres() throws Exception {
-        mvc.perform(get("/api/v1/families")).andExpect(jsonPath("$.length()").value(16));
+        mvc.perform(get("/api/v1/families")).andExpect(jsonPath("$.length()").value(24));
+        mvc.perform(get("/api/v1/models").param("manufacturer", "ibm"))
+                .andExpect(jsonPath("$.totalElements").value(5));
         mvc.perform(get("/api/v1/timeline")).andExpect(jsonPath("$.eras.length()").value(6));
         mvc.perform(get("/api/v1/compare").param("slugs", "macintosh-128k,imac-g3"))
                 .andExpect(jsonPath("$.comparisons[0].ramRatio").value(256.0));

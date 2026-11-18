@@ -39,6 +39,10 @@ final class AppleModelSpecifications {
                         cb.like(cb.lower(root.get("cpuName")), pattern, LIKE_ESCAPE),
                         cb.like(cb.lower(root.get("summary")), pattern, LIKE_ESCAPE)));
             }
+            if (hasText(filter.manufacturer())) {
+                predicates.add(cb.equal(cb.lower(root.get("manufacturer")),
+                        filter.manufacturer().trim().toLowerCase(Locale.ROOT)));
+            }
             return cb.and(predicates.toArray(Predicate[]::new));
         };
     }

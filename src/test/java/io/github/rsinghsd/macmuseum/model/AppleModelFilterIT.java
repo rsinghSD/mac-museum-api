@@ -29,7 +29,8 @@ class AppleModelFilterIT {
     void filtersByExactYear() throws Exception {
         mvc.perform(get("/api/v1/models").param("year", "1984"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalElements").value(4))
+                .andExpect(jsonPath("$.content[*].slug", hasItem("macintosh-128k")))
                 .andExpect(jsonPath("$.content[*].releaseYear", everyItem(is(1984))));
     }
 
@@ -47,8 +48,9 @@ class AppleModelFilterIT {
     void combinesFamilyAndCpu() throws Exception {
         mvc.perform(get("/api/v1/models").param("family", "powerbook").param("cpu", "POWERPC"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(1))
-                .andExpect(jsonPath("$.content[0].slug").value("powerbook-g4-titanium"));
+                .andExpect(jsonPath("$.totalElements").value(8))
+                .andExpect(jsonPath("$.content[*].family.slug", everyItem(is("powerbook"))))
+                .andExpect(jsonPath("$.content[*].slug", hasItem("powerbook-g4-titanium")));
     }
 
     @Test
@@ -87,6 +89,17 @@ class AppleModelFilterIT {
         mvc.perform(get("/api/v1/models").param("q", "imac").param("fromYear", "2006"))
                 .andExpect(jsonPath("$.content[*].releaseYear", everyItem(greaterThanOrEqualTo(2006))))
                 .andExpect(jsonPath("$.content[*].slug", hasItem("imac-24-m1")));
+    }
+
+    @Test
+    void filtersByManufacturerCaseInsensitively() throws Exception {
+        mvc.perform(get("/api/v1/models").param("manufacturer", "ibm"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(5))
+                .andExpect(jsonPath("$.content[*].manufacturer", everyItem(is("IBM"))))
+                .andExpect(jsonPath("$.content[*].family.slug", everyItem(is("contemporaries"))));
+        mvc.perform(get("/api/v1/models").param("manufacturer", "Apple").param("size", "1"))
+                .andExpect(jsonPath("$.content[0].manufacturer").value("Apple"));
     }
 
     @Test

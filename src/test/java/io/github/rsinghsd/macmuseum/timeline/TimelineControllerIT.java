@@ -4,6 +4,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,6 +35,14 @@ class TimelineControllerIT {
                 .andExpect(jsonPath("$.eras[3].label").value("PowerPC"))
                 .andExpect(jsonPath("$.eras[4].architecture").value("INTEL_X86"))
                 .andExpect(jsonPath("$.eras[5].architecture").value("APPLE_SILICON"))
-                .andExpect(jsonPath("$.eras[5].endYear").value(2022));
+                .andExpect(jsonPath("$.eras[4].startYear").value(2006))
+                .andExpect(jsonPath("$.eras[5].endYear").value(2026));
+    }
+
+    @Test
+    void leavesOutNonAppleContemporaries() throws Exception {
+        // The 1987 IBM PS/2 Model 80 would otherwise start the x86 era 19 years early.
+        mvc.perform(get("/api/v1/timeline"))
+                .andExpect(jsonPath("$.eras[*].models[*].slug", not(hasItem(startsWith("ibm-")))));
     }
 }
