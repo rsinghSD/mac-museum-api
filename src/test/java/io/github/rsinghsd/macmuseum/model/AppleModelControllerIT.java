@@ -29,8 +29,8 @@ class AppleModelControllerIT {
 
     private static final String VALID_BODY = """
             {
-              "slug": "power-mac-g4-mdd",
-              "name": "Power Mac G4 (Mirrored Drive Doors)",
+              "slug": "power-mac-g4-test-entry",
+              "name": "Power Mac G4 (test entry)",
               "releaseYear": 2002,
               "launchPriceUsd": null,
               "familySlug": "power-macintosh",
@@ -127,11 +127,20 @@ class AppleModelControllerIT {
         void createsModelAndReturnsLocation() throws Exception {
             mvc.perform(post("/api/v1/models").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string("Location", endsWith("/api/v1/models/power-mac-g4-mdd")))
-                    .andExpect(jsonPath("$.slug").value("power-mac-g4-mdd"))
-                    .andExpect(jsonPath("$.family.name").value("Power Macintosh"));
+                    .andExpect(header().string("Location", endsWith("/api/v1/models/power-mac-g4-test-entry")))
+                    .andExpect(jsonPath("$.slug").value("power-mac-g4-test-entry"))
+                    .andExpect(jsonPath("$.family.name").value("Power Macintosh"))
+                    .andExpect(jsonPath("$.manufacturer").value("Apple"));
 
-            mvc.perform(get("/api/v1/models/power-mac-g4-mdd")).andExpect(status().isOk());
+            mvc.perform(get("/api/v1/models/power-mac-g4-test-entry")).andExpect(status().isOk());
+        }
+
+        @Test
+        void storesExplicitManufacturer() throws Exception {
+            String ibm = VALID_BODY.replace("\"summary\":", "\"manufacturer\": \"IBM\", \"summary\":");
+            mvc.perform(post("/api/v1/models").contentType(MediaType.APPLICATION_JSON).content(ibm))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.manufacturer").value("IBM"));
         }
 
         @Test
@@ -153,7 +162,7 @@ class AppleModelControllerIT {
 
         @Test
         void returnsConflictForDuplicateSlug() throws Exception {
-            String duplicate = VALID_BODY.replace("power-mac-g4-mdd", "imac-g3");
+            String duplicate = VALID_BODY.replace("power-mac-g4-test-entry", "imac-g3");
             mvc.perform(post("/api/v1/models").contentType(MediaType.APPLICATION_JSON).content(duplicate))
                     .andExpect(status().isConflict())
                     .andExpect(content().contentType(PROBLEM_JSON))
@@ -195,8 +204,8 @@ class AppleModelControllerIT {
 
         @Test
         void replacesModel() throws Exception {
-            String body = VALID_BODY.replace("power-mac-g4-mdd", "imac-g3")
-                    .replace("Power Mac G4 (Mirrored Drive Doors)", "iMac G3 (Bondi Blue)");
+            String body = VALID_BODY.replace("power-mac-g4-test-entry", "imac-g3")
+                    .replace("Power Mac G4 (test entry)", "iMac G3 (Bondi Blue)");
             mvc.perform(put("/api/v1/models/imac-g3").contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("iMac G3 (Bondi Blue)"))
@@ -212,7 +221,7 @@ class AppleModelControllerIT {
 
         @Test
         void returnsConflictWhenRenamingToTakenSlug() throws Exception {
-            String body = VALID_BODY.replace("power-mac-g4-mdd", "imac-g4");
+            String body = VALID_BODY.replace("power-mac-g4-test-entry", "imac-g4");
             mvc.perform(put("/api/v1/models/imac-g3").contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isConflict());
         }

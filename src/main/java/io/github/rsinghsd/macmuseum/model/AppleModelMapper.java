@@ -20,7 +20,8 @@ final class AppleModelMapper {
                 model.getCpuName(),
                 model.getClockSpeedMhz(),
                 model.getBaseRamKb(),
-                model.getSummary());
+                model.getSummary(),
+                model.getManufacturer());
     }
 
     static AppleModel toEntity(AppleModelRequest request, ProductFamily family) {
@@ -29,6 +30,7 @@ final class AppleModelMapper {
         model.setLaunchPriceUsd(request.launchPriceUsd());
         model.setClockSpeedMhz(request.clockSpeedMhz());
         model.setBaseRamKb(request.baseRamKb());
+        model.setManufacturer(manufacturerOrDefault(request));
         return model;
     }
 
@@ -43,5 +45,11 @@ final class AppleModelMapper {
         model.setClockSpeedMhz(request.clockSpeedMhz());
         model.setBaseRamKb(request.baseRamKb());
         model.setSummary(request.summary());
+        model.setManufacturer(manufacturerOrDefault(request));
+    }
+
+    private static String manufacturerOrDefault(AppleModelRequest request) {
+        String manufacturer = request.manufacturer();
+        return manufacturer == null || manufacturer.isBlank() ? AppleModel.APPLE : manufacturer.trim();
     }
 }

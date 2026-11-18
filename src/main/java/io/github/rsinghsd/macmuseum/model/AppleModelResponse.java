@@ -13,7 +13,8 @@ public record AppleModelResponse(
         String cpuName,
         Integer clockSpeedMhz,
         Integer baseRamKb,
-        String summary) {
+        String summary,
+        String manufacturer) {
 
     /** Compact reference to the model's product family. */
     public record FamilyRef(String slug, String name) {

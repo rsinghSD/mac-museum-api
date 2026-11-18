@@ -24,7 +24,7 @@ class TimelineServiceTest {
 
     @Test
     void groupsModelsIntoErasOrderedByFirstRelease() {
-        when(modelService.findAllChronological()).thenReturn(List.of(
+        when(modelService.findAppleModelsChronological()).thenReturn(List.of(
                 model("imac-g3", 1998, CpuArchitecture.POWERPC),
                 model("apple-ii", 1977, CpuArchitecture.MOS_6502),
                 model("newton", 1993, CpuArchitecture.ARM),
@@ -60,6 +60,6 @@ class TimelineServiceTest {
 
     private static AppleModelResponse model(String slug, int year, CpuArchitecture cpu) {
         return new AppleModelResponse(slug, slug, year, null, new AppleModelResponse.FamilyRef("f", "Family"),
-                cpu, "cpu", null, null, "summary");
+                cpu, "cpu", null, null, "summary", "Apple");
     }
 }

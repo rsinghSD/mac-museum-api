@@ -23,9 +23,10 @@ class ProductFamilyControllerIT {
     void listsFamiliesSortedByNameWithModelCounts() throws Exception {
         mvc.perform(get("/api/v1/families"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(16))
+                .andExpect(jsonPath("$.length()").value(24))
                 .andExpect(jsonPath("$[0].slug").value("apple-i-ii"))
-                .andExpect(jsonPath("$[0].modelCount").value(3))
+                .andExpect(jsonPath("$[0].modelCount").value(7))
+                .andExpect(jsonPath("$[?(@.slug == 'contemporaries')].modelCount").value(hasItem(5)))
                 .andExpect(jsonPath("$[*].slug", hasItem("macintosh")))
                 .andExpect(jsonPath("$[?(@.slug == 'macintosh')].modelCount").value(
                         hasItem(greaterThanOrEqualTo(10))));

@@ -43,5 +43,9 @@ public record AppleModelRequest(
         Integer baseRamKb,
 
         @NotBlank @Size(max = 2000)
-        String summary) {
+        String summary,
+
+        /** Optional; defaults to "Apple". */
+        @Size(max = 60)
+        String manufacturer) {
 }

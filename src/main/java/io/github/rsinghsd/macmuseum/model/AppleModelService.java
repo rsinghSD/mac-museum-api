@@ -47,9 +47,12 @@ public class AppleModelService {
                 AppleModelMapper::toResponse);
     }
 
-    /** Every model ordered by release year, then name. Used by the timeline. */
-    public List<AppleModelResponse> findAllChronological() {
-        return repository.findAll(Sort.by("releaseYear", "name")).stream()
+    /**
+     * Apple's own models ordered by release year, then name. Used by the timeline, which tells
+     * Apple's story; non-Apple contemporaries are left out.
+     */
+    public List<AppleModelResponse> findAppleModelsChronological() {
+        return repository.findByManufacturer(AppleModel.APPLE, Sort.by("releaseYear", "name")).stream()
                 .map(AppleModelMapper::toResponse)
                 .toList();
     }
@@ -74,20 +77,20 @@ public class AppleModelService {
     }
 
     /**
-     * Picks a model at random, or deterministically for a given day so that every visitor sees the
-     * same "Mac of the day".
+     * Picks an Apple model at random, or deterministically for a given day so that every visitor
+     * sees the same "Mac of the day". Non-Apple contemporaries are never picked.
      *
-     * @throws ResourceNotFoundException when the catalog is empty
+     * @throws ResourceNotFoundException when there are no Apple models
      */
     public AppleModelResponse findRandom(LocalDate day) {
-        long count = repository.count();
+        long count = repository.countByManufacturer(AppleModel.APPLE);
         if (count == 0) {
             throw new ResourceNotFoundException("The catalog is empty");
         }
         int index = day == null
                 ? random.nextInt((int) count)
                 : Math.floorMod(Long.hashCode(day.toEpochDay() * 2_654_435_761L), (int) count);
-        return repository.findAll(PageRequest.of(index, 1, Sort.by("slug"))).stream()
+        return repository.findByManufacturer(AppleModel.APPLE, PageRequest.of(index, 1, Sort.by("slug"))).stream()
                 .findFirst()
                 .map(AppleModelMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("The catalog is empty"));

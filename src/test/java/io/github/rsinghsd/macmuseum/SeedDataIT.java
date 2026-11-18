@@ -25,8 +25,24 @@ class SeedDataIT {
     ProductFamilyRepository families;
 
     @Test
-    void seedsAtLeastThirtyFiveModels() {
-        assertThat(models.count()).isGreaterThanOrEqualTo(35);
+    void seedsAtLeastOneHundredFiftyModels() {
+        assertThat(models.count()).isGreaterThanOrEqualTo(150);
+    }
+
+    @Test
+    void keepsContemporariesSeparateFromApple() {
+        List<AppleModel> all = models.findAll();
+        assertThat(all).filteredOn(m -> !m.getManufacturer().equals("Apple"))
+                .isNotEmpty()
+                .allSatisfy(m -> assertThat(m.getFamily().getSlug()).isEqualTo("contemporaries"));
+        assertThat(all).filteredOn(m -> m.getFamily().getSlug().equals("contemporaries"))
+                .allSatisfy(m -> assertThat(m.getManufacturer()).isNotEqualTo("Apple"));
+    }
+
+    @Test
+    void hasNoReleaseYearInTheFuture() {
+        assertThat(models.findAll()).allSatisfy(m ->
+                assertThat(m.getReleaseYear()).isBetween(1976, java.time.Year.now().getValue()));
     }
 
     @Test

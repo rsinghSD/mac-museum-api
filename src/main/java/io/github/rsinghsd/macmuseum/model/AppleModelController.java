@@ -56,13 +56,16 @@ public class AppleModelController {
             @RequestParam(required = false) CpuArchitecture cpu,
             @Parameter(description = "Case-insensitive text search in name, CPU name and summary", example = "cube")
             @RequestParam(required = false) String q,
+            @Parameter(description = "Manufacturer, case-insensitive. Apple, or e.g. IBM for OS/2-era contemporaries",
+                    example = "Apple")
+            @RequestParam(required = false) String manufacturer,
             @ParameterObject
             @PageableDefault(size = 20)
             @SortDefault.SortDefaults({
                     @SortDefault(sort = "releaseYear", direction = Sort.Direction.ASC),
                     @SortDefault(sort = "name", direction = Sort.Direction.ASC)})
             Pageable pageable) {
-        return service.findAll(new AppleModelFilter(year, fromYear, toYear, family, cpu, q), pageable);
+        return service.findAll(new AppleModelFilter(year, fromYear, toYear, family, cpu, q, manufacturer), pageable);
     }
 
     @GetMapping("/{slug}")
