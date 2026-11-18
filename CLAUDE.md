@@ -99,6 +99,13 @@ repository.
 ## Data accuracy
 Seed data must only contain facts we are confident about. If a launch price
 or spec is uncertain, leave it `NULL`. Summaries are written in our own words.
+- Prices are US launch list prices of the base configuration. Subsidised
+  on-contract iPhone prices (before 2014) are left `NULL`.
+- Apple does not publish clock speeds for recent A-series and M5/M6 chips:
+  leave them `NULL` rather than copying benchmark readings.
+- Non-Apple machines (`manufacturer` other than `Apple`) belong only in the
+  `contemporaries` family. They appear in the catalog, search, detail and
+  compare, but never in `/timeline` or `/random` ("Mac of the day").
 
 ## Frontend
 Plain HTML/CSS/vanilla JS in `src/main/resources/static`. No build step, no

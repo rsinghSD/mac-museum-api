@@ -21,7 +21,8 @@
 
 ## Features
 
-- **Catalog:** 39 curated models in 16 product families. Prices or specs we are not sure of are left empty rather than guessed.
+- **Catalog:** 201 models in 24 families, from the Apple I (1976) to the releases of November 2026: Macs, Apple II, Lisa, Newton, iPod, iPhone, iPad, Apple Watch and Vision Pro. Prices or specs we are not sure of are left empty rather than guessed.
+- **OS/2-era contemporaries:** a few IBM machines from the time of OS/2 and OS/2 Warp, clearly marked as non-Apple, so you can compare a Power Series 830 with a Power Macintosh 8500. They stay out of the Apple timeline and "Mac of the day".
 - **Search & filters:** filter by exact year, year range, family, CPU architecture and free text. Results are paginated and sortable.
 - **Timeline:** the whole history grouped into CPU eras: 6502 → 68k → ARM → PowerPC → Intel → Apple silicon.
 - **Compare:** 2–4 models side by side, with clock and RAM multiples and price difference.
@@ -87,13 +88,13 @@ Base path `/api/v1`. Interactive docs at **`/swagger-ui.html`**, OpenAPI JSON at
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/models` | Paginated list. Filters: `year`, `fromYear`, `toYear`, `family`, `cpu`, `q`; plus `page`, `size` (max 100), `sort` |
+| GET | `/models` | Paginated list. Filters: `year`, `fromYear`, `toYear`, `family`, `cpu`, `q`, `manufacturer`; plus `page`, `size` (max 100), `sort` |
 | GET | `/models/{slug}` | One model |
 | POST 🔑 | `/models` | Create (201 + `Location`) |
 | PUT 🔑 | `/models/{slug}` | Replace (the slug in the body can rename it) |
 | DELETE 🔑 | `/models/{slug}` | Delete (204) |
 | GET | `/families` | Product families with model counts |
-| GET | `/timeline` | Models grouped by CPU era, oldest first |
+| GET | `/timeline` | Apple models grouped by CPU era, oldest first |
 | GET | `/compare?slugs=a,b` | 2–4 models side by side, compared with the first |
 | GET | `/random` | Random model; `?day=2026-11-11` gives a stable "Mac of the day" |
 
@@ -118,18 +119,18 @@ curl "http://localhost:8080/api/v1/random?day=2026-11-11"
 
 # Curate (the X-API-Key header is only needed when WRITE_API_KEY is set)
 curl -i -X POST http://localhost:8080/api/v1/models -H "X-API-Key: $WRITE_API_KEY" -H 'Content-Type: application/json' -d '{
-  "slug": "power-mac-g4-mdd", "name": "Power Mac G4 (Mirrored Drive Doors)",
-  "releaseYear": 2002, "familySlug": "power-macintosh", "cpuArchitecture": "POWERPC",
-  "cpuName": "PowerPC G4", "clockSpeedMhz": 867, "baseRamKb": 262144,
-  "summary": "A dual-processor tower nicknamed for its two drive bays."}'
-curl -i -X DELETE -H "X-API-Key: $WRITE_API_KEY" http://localhost:8080/api/v1/models/power-mac-g4-mdd
+  "slug": "macintosh-iivx", "name": "Macintosh IIvx",
+  "releaseYear": 1992, "familySlug": "macintosh", "cpuArchitecture": "M68K",
+  "cpuName": "Motorola 68030", "clockSpeedMhz": 32, "baseRamKb": 4096,
+  "summary": "The last Macintosh II model, in a metal desktop case with an optional CD-ROM drive."}'
+curl -i -X DELETE -H "X-API-Key: $WRITE_API_KEY" http://localhost:8080/api/v1/models/macintosh-iivx
 ```
 
 A model:
 ```json
 {"slug":"macintosh-128k","name":"Macintosh 128K","releaseYear":1984,"launchPriceUsd":2495.00,
  "family":{"slug":"macintosh","name":"Macintosh"},"cpuArchitecture":"M68K","cpuName":"Motorola 68000",
- "clockSpeedMhz":8,"baseRamKb":128,"summary":"The original Macintosh brought the mouse-driven ..."}
+ "clockSpeedMhz":8,"baseRamKb":128,"summary":"The original Macintosh brought the mouse-driven ...","manufacturer":"Apple"}
 ```
 
 A comparison (Macintosh 128K vs MacBook Air M1):
@@ -206,7 +207,8 @@ mac-museum-api/
 - [x] **v0.5** Docker, prod profile, PostgreSQL integration test
 - [ ] **v1.0** Live on Render
 - [x] **v0.6** API-key protection for write endpoints
-- [ ] **Next:** source citations per model · more models (Apple IIGS, Power Mac G4 MDD, Mac Studio…) · image gallery with freely licensed photos · ETag caching
+- [x] **v0.7** Catalog expanded to 201 models through November 2026, plus OS/2-era contemporaries
+- [ ] **Next:** source citations per model · image gallery with freely licensed photos · ETag caching
 
 ## License
 
