@@ -288,6 +288,7 @@ select {
 .chip[data-cpu="POWERPC"] { background: #c4d4f0; }
 .chip[data-cpu="INTEL_X86"] { background: #d8c8ec; }
 .chip[data-cpu="APPLE_SILICON"] { background: #f5f0b0; }
+.chip-maker { margin-left: 6px; background: var(--ink); color: var(--highlight); }
 
 .pager {
   display: flex;
