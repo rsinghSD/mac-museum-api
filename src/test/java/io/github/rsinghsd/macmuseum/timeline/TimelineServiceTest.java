@@ -60,6 +60,6 @@ class TimelineServiceTest {
 
     private static AppleModelResponse model(String slug, int year, CpuArchitecture cpu) {
         return new AppleModelResponse(slug, slug, year, null, new AppleModelResponse.FamilyRef("f", "Family"),
-                cpu, "cpu", null, null, "summary", "Apple");
+                cpu, "cpu", null, null, "summary", "Apple", null, null);
     }
 }

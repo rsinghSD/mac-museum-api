@@ -40,6 +40,33 @@ class SeedDataIT {
     }
 
     @Test
+    void usesOnlyFreelyLicensedHttpsImagesWithCredit() {
+        assertThat(models.findAll()).filteredOn(m -> m.getImage() != null && m.getImage().getUrl() != null)
+                .hasSizeGreaterThanOrEqualTo(100)
+                .allSatisfy(m -> {
+                    assertThat(m.getImage().getUrl()).matches("https://(upload|thumb)\\.wikimedia\\.org/.+");
+                    assertThat(m.getImage().getSourceUrl()).startsWith("https://commons.wikimedia.org/");
+                    assertThat(m.getImage().getCredit()).isNotBlank();
+                    assertThat(m.getImage().getLicense()).matches("(?i)CC0|Public domain|CC BY(-SA)? [0-9.]+( fr)?");
+                });
+    }
+
+    @Test
+    void embedsOnlyInfiniteMacAndLabelsApproximations() {
+        assertThat(models.findAll()).filteredOn(m -> m.getEmulator() != null && m.getEmulator().getUrl() != null)
+                .hasSizeGreaterThanOrEqualTo(70)
+                .allSatisfy(m -> {
+                    assertThat(m.getEmulator().getUrl()).startsWith("https://");
+                    if (m.getEmulator().getEmbedUrl() != null) {
+                        assertThat(m.getEmulator().getEmbedUrl()).startsWith("https://infinitemac.org/embed?disk=");
+                    }
+                    if (!m.getEmulator().isExactMachine()) {
+                        assertThat(m.getEmulator().getLabel()).contains("closest machine");
+                    }
+                });
+    }
+
+    @Test
     void hasNoReleaseYearInTheFuture() {
         assertThat(models.findAll()).allSatisfy(m ->
                 assertThat(m.getReleaseYear()).isBetween(1976, java.time.Year.now().getValue()));

@@ -65,6 +65,8 @@ erDiagram
         int base_ram_kb "nullable"
         text summary
         varchar manufacturer "Apple, or e.g. IBM for contemporaries"
+        varchar image_url "Wikimedia Commons, with credit, license, source"
+        varchar emulator_url "plus provider, label, embed url, exact machine"
     }
 ```
 

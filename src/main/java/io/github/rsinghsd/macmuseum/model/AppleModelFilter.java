@@ -12,6 +12,7 @@ import io.github.rsinghsd.macmuseum.common.BadRequestException;
  * @param cpu      CPU architecture
  * @param q            case-insensitive text matched against name, CPU name and summary
  * @param manufacturer maker, case-insensitive (e.g. "Apple", "IBM")
+ * @param bootable     {@code true}: only models with an in-browser emulator
  */
 public record AppleModelFilter(
         Integer year,
@@ -20,9 +21,11 @@ public record AppleModelFilter(
         String family,
         CpuArchitecture cpu,
         String q,
-        String manufacturer) {
+        String manufacturer,
+        Boolean bootable) {
 
-    public static final AppleModelFilter NONE = new AppleModelFilter(null, null, null, null, null, null, null);
+    public static final AppleModelFilter NONE =
+            new AppleModelFilter(null, null, null, null, null, null, null, null);
 
     /** Rejects contradictory criteria. */
     public void validate() {

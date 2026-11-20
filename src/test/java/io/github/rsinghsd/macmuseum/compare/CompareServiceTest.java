@@ -85,6 +85,6 @@ class CompareServiceTest {
 
     private static AppleModelResponse model(String slug, int year, String price, Integer mhz, Integer ramKb) {
         return new AppleModelResponse(slug, slug, year, price == null ? null : new BigDecimal(price),
-                new AppleModelResponse.FamilyRef("f", "Family"), CpuArchitecture.M68K, "cpu", mhz, ramKb, "s", "Apple");
+                new AppleModelResponse.FamilyRef("f", "Family"), CpuArchitecture.M68K, "cpu", mhz, ramKb, "s", "Apple", null, null);
     }
 }

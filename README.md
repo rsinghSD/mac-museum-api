@@ -23,6 +23,8 @@
 
 - **Catalog:** 201 models in 24 families, from the Apple I (1976) to the releases of November 2026: Macs, Apple II, Lisa, Newton, iPod, iPhone, iPad, Apple Watch and Vision Pro. Prices or specs we are not sure of are left empty rather than guessed.
 - **OS/2-era contemporaries:** a few IBM machines from the time of OS/2 and OS/2 Warp, clearly marked as non-Apple, so you can compare a Power Series 830 with a Power Macintosh 8500. They stay out of the Apple timeline and "Mac of the day".
+- **Photos:** 131 models have a freely licensed photo from Wikimedia Commons, credited with author and license. Each was checked by hand to show the model itself, so some models have no photo yet.
+- **Boot it in your browser:** 76 models can be started in a live emulator. 23 Macs boot on their exact emulated machine with the system they shipped with (System 1.0 on the Mac 128K, Mac OS 8.1 on the iMac G3…); other Macs up to 2005 boot a period-correct system on the closest emulated machine, clearly labelled. The Apple II family opens in Apple ][js, and the IBM PS/2 boots IBM OS/2 1.0 on PCjs.
 - **Search & filters:** filter by exact year, year range, family, CPU architecture and free text. Results are paginated and sortable.
 - **Timeline:** the whole history grouped into CPU eras: 6502 → 68k → ARM → PowerPC → Intel → Apple silicon.
 - **Compare:** 2–4 models side by side, with clock and RAM multiples and price difference.
@@ -88,7 +90,7 @@ Base path `/api/v1`. Interactive docs at **`/swagger-ui.html`**, OpenAPI JSON at
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/models` | Paginated list. Filters: `year`, `fromYear`, `toYear`, `family`, `cpu`, `q`, `manufacturer`; plus `page`, `size` (max 100), `sort` |
+| GET | `/models` | Paginated list. Filters: `year`, `fromYear`, `toYear`, `family`, `cpu`, `q`, `manufacturer`, `bootable`; plus `page`, `size` (max 100), `sort` |
 | GET | `/models/{slug}` | One model |
 | POST 🔑 | `/models` | Create (201 + `Location`) |
 | PUT 🔑 | `/models/{slug}` | Replace (the slug in the body can rename it) |
@@ -130,7 +132,11 @@ A model:
 ```json
 {"slug":"macintosh-128k","name":"Macintosh 128K","releaseYear":1984,"launchPriceUsd":2495.00,
  "family":{"slug":"macintosh","name":"Macintosh"},"cpuArchitecture":"M68K","cpuName":"Motorola 68000",
- "clockSpeedMhz":8,"baseRamKb":128,"summary":"The original Macintosh brought the mouse-driven ...","manufacturer":"Apple"}
+ "clockSpeedMhz":8,"baseRamKb":128,"summary":"The original Macintosh brought the mouse-driven ...","manufacturer":"Apple",
+ "image":{"url":"https://thumb.wikimedia.org/…","credit":"…","license":"CC BY-SA 4.0","sourceUrl":"https://commons.wikimedia.org/wiki/File:…"},
+ "emulator":{"provider":"Infinite Mac","label":"System 1.0 on an emulated Mac 128K",
+  "url":"https://infinitemac.org/run?disk=System%201.0&machine=Mac%20128K",
+  "embedUrl":"https://infinitemac.org/embed?disk=System%201.0&machine=Mac%20128K","exactMachine":true}}
 ```
 
 A comparison (Macintosh 128K vs MacBook Air M1):
@@ -208,7 +214,13 @@ mac-museum-api/
 - [ ] **v1.0** Live on Render
 - [x] **v0.6** API-key protection for write endpoints
 - [x] **v0.7** Catalog expanded to 201 models through November 2026, plus OS/2-era contemporaries
-- [ ] **Next:** source citations per model · image gallery with freely licensed photos · ETag caching
+- [x] **v0.8** Photos (Wikimedia Commons) and in-browser emulators
+- [ ] **Next:** source citations per model · photos for the remaining models with freely licensed photos · ETag caching
+
+## Credits
+
+- **Emulators:** [Infinite Mac](https://infinitemac.org) by Mihai Parparita (classic Mac OS and Mac OS X, embedded with its official `/embed` mode), [Apple ][js](https://www.scullinsteel.com/apple2/) by Will Scullin, and [PCjs](https://www.pcjs.org) by Jeff Parsons.
+- **Photos:** contributors to [Wikimedia Commons](https://commons.wikimedia.org). Each photo's author and license are shown in the app and returned by the API (`image.credit`, `image.license`, `image.sourceUrl`).
 
 ## License
 

@@ -14,7 +14,9 @@ public record AppleModelResponse(
         Integer clockSpeedMhz,
         Integer baseRamKb,
         String summary,
-        String manufacturer) {
+        String manufacturer,
+        ImageDto image,
+        EmulatorDto emulator) {
 
     /** Compact reference to the model's product family. */
     public record FamilyRef(String slug, String name) {
